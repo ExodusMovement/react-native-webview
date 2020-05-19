@@ -1,5 +1,5 @@
 {
-  "name": "react-native-webview",
+  "name": "@exodus/react-native-webview",
   "description": "React Native WebView component for iOS, Android, macOS, and Windows",
   "main": "index.js",
   "typings": "index.d.ts",
