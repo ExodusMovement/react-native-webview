@@ -3,9 +3,8 @@
   "compilerOptions": {
     "baseUrl": "./src/",
     "jsx": "react-native",
-    "module": "esnext",
+    "target": "esnext",
     "moduleResolution": "node",
-    "lib": ["es2017"],
     "declaration": true,
     "declarationMap": true,
     "outDir": "lib",
