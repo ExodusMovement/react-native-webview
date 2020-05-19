@@ -79,7 +79,6 @@
   "files": [
     "ios",
     "lib/*.js",
-    "!lib/*.android.js",
     "!lib/*.windows.js",
     "!lib/*.macos.js",
     "!lib/*.apple.js",
