@@ -1,7 +1,6 @@
 {
   "name": "@exodus/react-native-webview",
   "description": "React Native WebView component for iOS, Android, macOS, and Windows",
-  "main": "index.js",
   "typings": "index.d.ts",
   "author": "Jamon Holmgren <jamon@infinite.red>",
   "contributors": [
@@ -78,14 +77,12 @@
     "url": "https://github.com/react-native-community/react-native-webview.git"
   },
   "files": [
-    "android",
-    "apple",
     "ios",
-    "macos",
-    "windows",
-    "lib",
-    "index.js",
-    "index.d.ts",
+    "lib/*.js",
+    "!lib/*.android.js",
+    "!lib/*.windows.js",
+    "!lib/*.macos.js",
+    "!lib/*.apple.js",
     "react-native-webview.podspec"
   ]
 }
