@@ -300,7 +300,6 @@ export interface AndroidNativeWebViewProps extends CommonNativeWebViewProps {
   cacheMode?: CacheMode;
   allowFileAccess?: boolean;
   scalesPageToFit?: boolean;
-  allowFileAccessFromFileURLs?: boolean;
   allowsFullscreenVideo?: boolean;
   androidHardwareAccelerationDisabled?: boolean;
   androidLayerType?: AndroidLayerType;
@@ -348,7 +347,6 @@ export interface IOSNativeWebViewProps extends CommonNativeWebViewProps {
   allowsInlineMediaPlayback?: boolean;
   allowsAirPlayForMediaPlayback?: boolean;
   allowsLinkPreview?: boolean;
-  allowFileAccessFromFileURLs?: boolean;
   automaticallyAdjustContentInsets?: boolean;
   autoManageStatusBarEnabled?: boolean;
   bounces?: boolean;
@@ -580,14 +578,6 @@ export interface IOSWebViewProps extends WebViewSharedProps {
   allowingReadAccessToURL?: string;
 
   /**
-   * Boolean that sets whether JavaScript running in the context of a file
-   * scheme URL should be allowed to access content from other file scheme URLs.
-   * Including accessing content from other file scheme URLs
-   * @platform ios
-   */
-  allowFileAccessFromFileURLs?: boolean;
-
-  /**
    * Function that is invoked when the WebKit WebView content process gets terminated.
    * @platform ios
    */
@@ -740,14 +730,6 @@ export interface AndroidWebViewProps extends WebViewSharedProps {
    * @platform android
    */
   geolocationEnabled?: boolean;
-
-  /**
-   * Boolean that sets whether JavaScript running in the context of a file
-   * scheme URL should be allowed to access content from other file scheme URLs.
-   * Including accessing content from other file scheme URLs
-   * @platform android
-   */
-  allowFileAccessFromFileURLs?: boolean;
 
   /**
    * Sets whether the webview allow access to file system.
