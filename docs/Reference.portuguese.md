@@ -58,7 +58,6 @@ Este documento apresenta as propriedades e métodos públicos para o React Nativ
 - [`directionalLockEnabled`](Reference.portuguese.md#directionalLockEnabled)
 - [`geolocationEnabled`](Reference.portuguese.md#geolocationenabled)
 - [`allowFileAccessFromFileURLs`](Reference.portuguese.md#allowFileAccessFromFileURLs)
-- [`allowUniversalAccessFromFileURLs`](Reference.portuguese.md#allowUniversalAccessFromFileURLs)
 - [`allowingReadAccessToURL`](Reference.portuguese.md#allowingReadAccessToURL)
 - [`url`](Reference.portuguese.md#url)
 - [`html`](Reference.portuguese.md#html)
@@ -1143,7 +1142,6 @@ Booleano que define se o JavaScript executado no contexto de uma URL de esquema 
 
 ---
 
-### `allowUniversalAccessFromFileURLs`[⬆](#props-index)<!-- Link gerado com jump2header -->
 
 Booleano que define se o JavaScript executado no contexto de uma URL de esquema de arquivo deve ter permissão para acessar conteúdo de qualquer origem. Incluindo o acesso ao conteúdo de outros URLs de esquema de arquivos. O valor padrão é `falso`.
 
