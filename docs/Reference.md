@@ -57,7 +57,6 @@ This document lays out the current public properties and methods for the React N
 - [`setDisplayZoomControls`](Reference.md#setDisplayZoomControls)
 - [`directionalLockEnabled`](Reference.md#directionalLockEnabled)
 - [`geolocationEnabled`](Reference.md#geolocationenabled)
-- [`allowFileAccessFromFileURLs`](Reference.md#allowFileAccessFromFileURLs)
 - [`allowingReadAccessToURL`](Reference.md#allowingReadAccessToURL)
 - [`url`](Reference.md#url)
 - [`html`](Reference.md#html)
@@ -1139,25 +1138,6 @@ Set whether Geolocation is enabled in the `WebView`. The default value is `false
 | Type | Required | Platform |
 | ---- | -------- | -------- |
 | bool | No       | Android  |
-
----
-
-### `allowFileAccessFromFileURLs`[⬆](#props-index)<!-- Link generated with jump2header -->
-
-Boolean that sets whether JavaScript running in the context of a file scheme URL should be allowed to access content from other file scheme URLs. The default value is `false`.
-
-| Type | Required | Platform            |
-| ---- | -------- | ------------------- |
-| bool | No       | iOS, Android, macOS |
-
----
-
-
-Boolean that sets whether JavaScript running in the context of a file scheme URL should be allowed to access content from any origin. Including accessing content from other file scheme URLs. The default value is `false`.
-
-| Type | Required | Platform             |
-| ---- | -------- | -------------------- |
-| bool | No       | iOS, Android, macOS  |
 
 ---
 

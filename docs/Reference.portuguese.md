@@ -57,7 +57,6 @@ Este documento apresenta as propriedades e métodos públicos para o React Nativ
 - [`setDisplayZoomControls`](Reference.portuguese.md#setDisplayZoomControls)
 - [`directionalLockEnabled`](Reference.portuguese.md#directionalLockEnabled)
 - [`geolocationEnabled`](Reference.portuguese.md#geolocationenabled)
-- [`allowFileAccessFromFileURLs`](Reference.portuguese.md#allowFileAccessFromFileURLs)
 - [`allowingReadAccessToURL`](Reference.portuguese.md#allowingReadAccessToURL)
 - [`url`](Reference.portuguese.md#url)
 - [`html`](Reference.portuguese.md#html)
@@ -1129,25 +1128,6 @@ Defina se a geolocalização está habilitada na `WebView`. O valor padrão é `
 | Tipo | Requerido | Plataforma |
 | ---- | --------- | ---------- |
 | bool | Não       | Android    |
-
----
-
-### `allowFileAccessFromFileURLs`[⬆](#props-index)<!-- Link gerado com jump2header -->
-
-Booleano que define se o JavaScript executado no contexto de uma URL de esquema de arquivo deve ter permissão para acessar o conteúdo de outras URLs de esquema de arquivo. O valor padrão é `falso`.
-
-| Tipo | Requerido | Plataforma          |
-| ---- | --------- | ------------------- |
-| bool | Não       | iOS, Android, macOS |
-
----
-
-
-Booleano que define se o JavaScript executado no contexto de uma URL de esquema de arquivo deve ter permissão para acessar conteúdo de qualquer origem. Incluindo o acesso ao conteúdo de outros URLs de esquema de arquivos. O valor padrão é `falso`.
-
-| Tipo | Requerido | Plataforma           |
-| ---- | --------- | -------------------- |
-| bool | Não       | iOS, Android, macOS  |
 
 ---
 
