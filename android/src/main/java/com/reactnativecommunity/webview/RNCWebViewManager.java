@@ -203,7 +203,6 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     settings.setAllowContentAccess(false);
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
       settings.setAllowFileAccessFromFileURLs(false);
-      setAllowUniversalAccessFromFileURLs(webView, false);
     }
     setMixedContentMode(webView, "never");
 
@@ -453,11 +452,6 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   @ReactProp(name = "allowFileAccessFromFileURLs")
   public void setAllowFileAccessFromFileURLs(WebView view, boolean allow) {
     view.getSettings().setAllowFileAccessFromFileURLs(allow);
-  }
-
-  @ReactProp(name = "allowUniversalAccessFromFileURLs")
-  public void setAllowUniversalAccessFromFileURLs(WebView view, boolean allow) {
-    view.getSettings().setAllowUniversalAccessFromFileURLs(allow);
   }
 
   @ReactProp(name = "saveFormDataDisabled")
