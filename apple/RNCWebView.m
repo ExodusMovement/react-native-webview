@@ -311,10 +311,6 @@ RCTAutoInsetsProtocol>
     prefs.javaScriptEnabled = NO;
     _prefsUsed = YES;
   }
-  if (_allowFileAccessFromFileURLs) {
-    [prefs setValue:@TRUE forKey:@"allowFileAccessFromFileURLs"];
-    _prefsUsed = YES;
-  }
   if (_javaScriptCanOpenWindowsAutomatically) {
     [prefs setValue:@TRUE forKey:@"javaScriptCanOpenWindowsAutomatically"];
     _prefsUsed = YES;
