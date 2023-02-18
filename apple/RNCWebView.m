@@ -311,9 +311,6 @@ RCTAutoInsetsProtocol>
     prefs.javaScriptEnabled = NO;
     _prefsUsed = YES;
   }
-  if (_allowUniversalAccessFromFileURLs) {
-    [wkWebViewConfig setValue:@TRUE forKey:@"allowUniversalAccessFromFileURLs"];
-  }
   if (_allowFileAccessFromFileURLs) {
     [prefs setValue:@TRUE forKey:@"allowFileAccessFromFileURLs"];
     _prefsUsed = YES;

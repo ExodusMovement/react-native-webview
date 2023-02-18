@@ -69,7 +69,6 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *_Nonnull)request
 @property (nonatomic, assign) BOOL javaScriptEnabled;
 @property (nonatomic, assign) BOOL javaScriptCanOpenWindowsAutomatically;
 @property (nonatomic, assign) BOOL allowFileAccessFromFileURLs;
-@property (nonatomic, assign) BOOL allowUniversalAccessFromFileURLs;
 @property (nonatomic, assign) BOOL allowsLinkPreview;
 @property (nonatomic, assign) BOOL showsHorizontalScrollIndicator;
 @property (nonatomic, assign) BOOL showsVerticalScrollIndicator;

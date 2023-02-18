@@ -69,7 +69,6 @@ RCT_EXPORT_VIEW_PROPERTY(injectedJavaScriptBeforeContentLoadedForMainFrameOnly, 
 RCT_EXPORT_VIEW_PROPERTY(javaScriptEnabled, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(javaScriptCanOpenWindowsAutomatically, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(allowFileAccessFromFileURLs, BOOL)
-RCT_EXPORT_VIEW_PROPERTY(allowUniversalAccessFromFileURLs, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(allowsInlineMediaPlayback, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(allowsAirPlayForMediaPlayback, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(mediaPlaybackRequiresUserAction, BOOL)
