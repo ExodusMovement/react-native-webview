@@ -26,7 +26,7 @@ const HTML = `<!DOCTYPE html>\n
         window.ReactNativeWebView.postMessage('Message from JS');
       }
 
-      window.addEventListener('message',function(event){
+      document.addEventListener('message',function(event){
         console.log("Message received from RN: ",event.data)
       },false);
 
