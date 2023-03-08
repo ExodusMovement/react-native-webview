@@ -885,7 +885,7 @@ RCTAutoInsetsProtocol>
 {
   NSDictionary *eventInitDict = @{@"data": message};
   NSString *source = [NSString
-                      stringWithFormat:@"window.dispatchEvent(new MessageEvent('message', %@));",
+                      stringWithFormat:@"document.dispatchEvent(new MessageEvent('message', %@));",
                       RCTJSONStringify(eventInitDict, NULL)
   ];
   [self injectJavaScript: source];
