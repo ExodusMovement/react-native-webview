@@ -230,25 +230,6 @@ export interface ViewManager {
   startLoadWithResult: Function;
 }
 
-export interface WebViewNativeConfig {
-  /**
-   * The native component used to render the WebView.
-   */
-  component?:
-    | typeof NativeWebViewIOS
-    | typeof NativeWebViewAndroid;
-  /**
-   * Set props directly on the native component WebView. Enables custom props which the
-   * original WebView doesn't pass through.
-   */
-  props?: Object;
-  /**
-   * Set the ViewManager to use for communication with the native side.
-   * @platform ios, macos
-   */
-  viewManager?: ViewManager;
-}
-
 export type OnShouldStartLoadWithRequest = (
   event: ShouldStartLoadRequest,
 ) => boolean;
@@ -1072,12 +1053,6 @@ export interface WebViewSharedProps extends ViewProps {
    * to stop loading. The `navigationType` is always `other` on android.
    */
   onShouldStartLoadWithRequest?: OnShouldStartLoadWithRequest;
-
-  /**
-   * Override the native component used to render the WebView. Enables a custom native
-   * WebView which uses the same JavaScript as the original WebView.
-   */
-  nativeConfig?: WebViewNativeConfig;
 
   /**
    * Should caching be enabled. Default is true.

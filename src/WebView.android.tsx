@@ -82,7 +82,6 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
   style,
   containerStyle,
   source,
-  nativeConfig,
   onShouldStartLoadWithRequest: onShouldStartLoadWithRequestProp,
   ...otherProps
 }, ref) => {
@@ -169,8 +168,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
   }
 
 
-  const NativeWebView
-    = (nativeConfig?.component as (typeof NativeWebViewAndroid | undefined)) || RNCWebView;
+  const NativeWebView = RNCWebView;
 
   const webView = <NativeWebView
     key="webViewKey"
@@ -212,7 +210,6 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
     mixedContentMode={mixedContentMode}
     nestedScrollEnabled={nestedScrollEnabled}
     mediaPlaybackRequiresUserAction={mediaPlaybackRequiresUserAction}
-    {...nativeConfig?.props}
   />
 
   return (

@@ -94,7 +94,6 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
   style,
   containerStyle,
   source,
-  nativeConfig,
   incognito,
   decelerationRate: decelerationRateProp,
   onShouldStartLoadWithRequest: onShouldStartLoadWithRequestProp,
@@ -107,12 +106,10 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
     _url: string,
     lockIdentifier = 0,
   ) => {
-    const viewManager
-      = (nativeConfig?.viewManager)
-      || RNCWebViewManager;
+    const viewManager = RNCWebViewManager;
 
     viewManager.startLoadWithResult(!!shouldStart, lockIdentifier);
-  }, [nativeConfig?.viewManager]);
+  }, []);
 
   const { onLoadingStart, onShouldStartLoadWithRequest, onMessage, viewState, setViewState, lastErrorEvent, onHttpError, onLoadingError, onLoadingFinish, onLoadingProgress, onContentProcessDidTerminate } = useWebWiewLogic({
     onNavigationStateChange,
@@ -170,9 +167,7 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
 
   const decelerationRate = processDecelerationRate(decelerationRateProp);
 
-  const NativeWebView
-  = (nativeConfig?.component as typeof NativeWebViewIOS | undefined)
-  || RNCWebView;
+  const NativeWebView = RNCWebView;
 
   const webView = (
     <NativeWebView
@@ -210,7 +205,6 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
       // TODO: find a better way to type this.
       source={resolveAssetSource(source as ImageSourcePropType)}
       style={webViewStyles}
-      {...nativeConfig?.props}
     />
   );
 
