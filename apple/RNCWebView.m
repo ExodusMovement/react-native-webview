@@ -306,7 +306,7 @@ RCTAutoInsetsProtocol>
 {
   WKWebViewConfiguration *wkWebViewConfig = [WKWebViewConfiguration new];
   WKPreferences *prefs = [[WKPreferences alloc]init];
-  BOOL _prefsUsed = NO;
+  BOOL _prefsUsed = YES;
   if (!_javaScriptEnabled) {
     prefs.javaScriptEnabled = NO;
     _prefsUsed = YES;

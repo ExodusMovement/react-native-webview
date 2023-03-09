@@ -30,7 +30,7 @@ import styles from './WebView.styles';
 const codegenNativeCommands = codegenNativeCommandsUntyped as <T extends {}>(options: { supportedCommands: (keyof T)[] }) => T;
 
 const Commands = codegenNativeCommands({
-  supportedCommands: ['goBack', 'goForward', 'reload', 'stopLoading', 'injectJavaScript', 'requestFocus', 'postMessage', 'clearFormData', 'clearCache', 'clearHistory', 'loadUrl'],
+  supportedCommands: ['goBack', 'goForward', 'reload', 'stopLoading', /* 'injectJavaScript', */ 'requestFocus', 'postMessage', 'clearFormData', 'clearCache', 'clearHistory', 'loadUrl'],
 });
 
 const { resolveAssetSource } = Image;
@@ -40,19 +40,30 @@ const { resolveAssetSource } = Image;
  */
 let uniqueRef = 0;
 
+/**
+ * Harcoded default for security.
+ */
+const allowFileAccessFromFileURLs = false;
+const allowUniversalAccessFromFileURLs = false;
+const injectedJavaScriptForMainFrameOnly = true;
+const injectedJavaScriptBeforeContentLoadedForMainFrameOnly = true;
+const mediaPlaybackRequiresUserAction = true;
+// Android only
+const allowsFullscreenVideo = false;
+const allowFileAccess = false;
+const setSupportMultipleWindows = true;
+const mixedContentMode = 'never'
+
 const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
   overScrollMode = 'always',
   javaScriptEnabled = true,
   thirdPartyCookiesEnabled = true,
   scalesPageToFit = true,
-  allowsFullscreenVideo = false,
-  allowFileAccess = false,
   saveFormDataDisabled = false,
   cacheEnabled = true,
   androidHardwareAccelerationDisabled = false,
   androidLayerType = "none",
   originWhitelist = defaultOriginWhitelist,
-  setSupportMultipleWindows = true,
   setBuiltInZoomControls = true,
   setDisplayZoomControls = false,
   nestedScrollEnabled = false,
@@ -114,7 +125,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
     },
     stopLoading: () => Commands.stopLoading(webViewRef.current),
     postMessage: (data: string) => Commands.postMessage(webViewRef.current, data),
-    injectJavaScript: (data: string) => Commands.injectJavaScript(webViewRef.current, data),
+    // injectJavaScript: (data: string) => Commands.injectJavaScript(webViewRef.current, data),
     requestFocus: () => Commands.requestFocus(webViewRef.current),
     clearFormData: () => Commands.clearFormData(webViewRef.current),
     clearCache: (includeDiskFiles: boolean) => Commands.clearCache(webViewRef.current, includeDiskFiles),
@@ -176,6 +187,9 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
     onMessage={onMessage}
     onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
 
+    injectedJavaScriptForMainFrameOnly={injectedJavaScriptForMainFrameOnly}
+    injectedJavaScriptBeforeContentLoadedForMainFrameOnly={injectedJavaScriptBeforeContentLoadedForMainFrameOnly}
+    
     ref={webViewRef}
     // TODO: find a better way to type this.
     source={resolveAssetSource(source as ImageSourcePropType)}
@@ -186,6 +200,8 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
     scalesPageToFit={scalesPageToFit}
     allowsFullscreenVideo={allowsFullscreenVideo}
     allowFileAccess={allowFileAccess}
+    allowFileAccessFromFileURLs={allowFileAccessFromFileURLs}
+    allowUniversalAccessFromFileURLs={allowUniversalAccessFromFileURLs}
     saveFormDataDisabled={saveFormDataDisabled}
     cacheEnabled={cacheEnabled}
     androidHardwareAccelerationDisabled={androidHardwareAccelerationDisabled}
@@ -193,7 +209,9 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
     setSupportMultipleWindows={setSupportMultipleWindows}
     setBuiltInZoomControls={setBuiltInZoomControls}
     setDisplayZoomControls={setDisplayZoomControls}
+    mixedContentMode={mixedContentMode}
     nestedScrollEnabled={nestedScrollEnabled}
+    mediaPlaybackRequiresUserAction={mediaPlaybackRequiresUserAction}
     {...nativeConfig?.props}
   />
 

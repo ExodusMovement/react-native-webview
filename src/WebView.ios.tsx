@@ -29,7 +29,7 @@ import styles from './WebView.styles';
 const codegenNativeCommands = codegenNativeCommandsUntyped as <T extends {}>(options: { supportedCommands: (keyof T)[] }) => T;
 
 const Commands = codegenNativeCommands({
-  supportedCommands: ['goBack', 'goForward', 'reload', 'stopLoading', 'injectJavaScript', 'requestFocus', 'postMessage', 'loadUrl'],
+  supportedCommands: ['goBack', 'goForward', 'reload', 'stopLoading', /* 'injectJavaScript', */ 'requestFocus', 'postMessage', 'loadUrl'],
 });
 
 const { resolveAssetSource } = Image;
@@ -55,16 +55,30 @@ const useWarnIfChanges = <T extends unknown>(value: T, name: string) => {
   }
 }
 
+/**
+ * Harcoded defaults for security.
+ */
+const allowFileAccessFromFileURLs = false;
+const allowUniversalAccessFromFileURLs = false;
+const injectedJavaScriptForMainFrameOnly = true;
+const injectedJavaScriptBeforeContentLoadedForMainFrameOnly = true;
+const mediaPlaybackRequiresUserAction = true;
+// iOS only configs
+const allowsInlineMediaPlayback = true;
+const allowsAirPlayForMediaPlayback = false;
+const useSharedProcessPool = false;
+const sharedCookiesEnabled = false;
+const enableApplePay = false;
+const onFileDownload = () => console.error('tried to download file')
+const dataDetectorTypes = 'none';
+
 const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
   javaScriptEnabled = true,
   cacheEnabled = true,
   originWhitelist = defaultOriginWhitelist,
-  useSharedProcessPool= true,
   textInteractionEnabled= true,
   injectedJavaScript,
   injectedJavaScriptBeforeContentLoaded,
-  injectedJavaScriptForMainFrameOnly = true,
-  injectedJavaScriptBeforeContentLoadedForMainFrameOnly = true,
   startInLoadingState,
   onNavigationStateChange,
   onLoadStart,
@@ -73,7 +87,6 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
   onLoadEnd,
   onLoadProgress,
   onContentProcessDidTerminate: onContentProcessDidTerminateProp,
-  onFileDownload,
   onHttpError: onHttpErrorProp,
   onMessage: onMessageProp,
   renderLoading,
@@ -82,10 +95,6 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
   containerStyle,
   source,
   nativeConfig,
-  allowsInlineMediaPlayback,
-  allowsAirPlayForMediaPlayback,
-  mediaPlaybackRequiresUserAction,
-  dataDetectorTypes,
   incognito,
   decelerationRate: decelerationRateProp,
   onShouldStartLoadWithRequest: onShouldStartLoadWithRequestProp,
@@ -131,7 +140,7 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
     },
     stopLoading: () => Commands.stopLoading(webViewRef.current),
     postMessage: (data: string) => Commands.postMessage(webViewRef.current, data),
-    injectJavaScript: (data: string) => Commands.injectJavaScript(webViewRef.current, data),
+    // injectJavaScript: (data: string) => Commands.injectJavaScript(webViewRef.current, data),
     requestFocus: () => Commands.requestFocus(webViewRef.current),
   }), [setViewState, webViewRef]);
 
@@ -169,8 +178,12 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
     <NativeWebView
       key="webViewKey"
       {...otherProps}
+      allowFileAccessFromFileURLs={allowFileAccessFromFileURLs}
+      allowUniversalAccessFromFileURLs={allowUniversalAccessFromFileURLs}
+      enableApplePay={enableApplePay}
       javaScriptEnabled={javaScriptEnabled}
       cacheEnabled={cacheEnabled}
+      dataDetectorTypes={dataDetectorTypes}
       useSharedProcessPool={useSharedProcessPool}
       textInteractionEnabled={textInteractionEnabled}
       decelerationRate={decelerationRate}
@@ -188,12 +201,12 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
       injectedJavaScriptBeforeContentLoaded={injectedJavaScriptBeforeContentLoaded}
       injectedJavaScriptForMainFrameOnly={injectedJavaScriptForMainFrameOnly}
       injectedJavaScriptBeforeContentLoadedForMainFrameOnly={injectedJavaScriptBeforeContentLoadedForMainFrameOnly}
-      dataDetectorTypes={dataDetectorTypes}
       allowsAirPlayForMediaPlayback={allowsAirPlayForMediaPlayback}
       allowsInlineMediaPlayback={allowsInlineMediaPlayback}
       incognito={incognito}
       mediaPlaybackRequiresUserAction={mediaPlaybackRequiresUserAction}
       ref={webViewRef}
+      sharedCookiesEnabled={sharedCookiesEnabled}
       // TODO: find a better way to type this.
       source={resolveAssetSource(source as ImageSourcePropType)}
       style={webViewStyles}
