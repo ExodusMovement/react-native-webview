@@ -17,6 +17,7 @@ import android.os.Environment;
 import android.os.Message;
 import android.os.SystemClock;
 import android.text.TextUtils;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -82,9 +83,6 @@ import com.reactnativecommunity.webview.events.TopLoadingProgressEvent;
 import com.reactnativecommunity.webview.events.TopLoadingStartEvent;
 import com.reactnativecommunity.webview.events.TopMessageEvent;
 import com.reactnativecommunity.webview.events.TopShouldStartLoadWithRequestEvent;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.IllegalArgumentException;
@@ -638,14 +636,9 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         root.stopLoading();
         break;
       case "postMessage":
-        try {
-          RNCWebView reactWebView = (RNCWebView) root;
-          JSONObject eventInitDict = new JSONObject();
-          eventInitDict.put("data", args.getString(0));
-          reactWebView.evaluateJavascriptWithFallback("document.dispatchEvent(new MessageEvent('message', " + eventInitDict.toString() + "));");
-        } catch (JSONException e) {
-          throw new RuntimeException(e);
-        }
+        RNCWebView reactWebView_ = (RNCWebView) root;
+        String encodedString = Base64.encodeToString(args.getString(0).getBytes(), Base64.DEFAULT | Base64.NO_WRAP);
+        reactWebView_.evaluateJavascriptWithFallback("(function(){const b = atob('" + encodedString + "'); document.dispatchEvent(new MessageEvent('message', {data: new TextDecoder('utf-8').decode(new Uint8Array(b.length).map((_, i) => b.charCodeAt(i)))}));})()");
         break;
       case "injectJavaScript":
         RNCWebView reactWebView = (RNCWebView) root;
