@@ -27,6 +27,17 @@ import {
 
 import styles from './WebView.styles';
 
+const { getWebViewDefaultUserAgent } = NativeModules.RNCWebViewUtils;
+
+let userAgentCache
+
+function getUserAgent() {
+  if (typeof userAgentCache === 'undefined') {
+    userAgentCache = getWebViewDefaultUserAgent() || ''
+  }
+  return userAgentCache
+}
+
 const codegenNativeCommands = codegenNativeCommandsUntyped as <T extends {}>(options: { supportedCommands: (keyof T)[] }) => T;
 
 const Commands = codegenNativeCommands({
@@ -130,7 +141,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
     BatchedBridge.registerCallableModule(messagingModuleName, directEventCallbacks);
   }, [messagingModuleName, directEventCallbacks])
 
-  const userAgent = 'chrome/200' // TODO
+  const userAgent = getUserAgent()
   const version = userAgent.match(/chrome\/((?:[0-9]+\.)+[0-9]+)/i)?.[1]
   if (!(versionPasses(version, minimumChromeVersion) && versionPasses(version, hardMinimumChromeVersion))) {
     return (
