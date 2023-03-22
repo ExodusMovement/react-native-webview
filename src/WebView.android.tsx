@@ -29,13 +29,13 @@ import styles from './WebView.styles';
 
 const { getWebViewDefaultUserAgent } = NativeModules.RNCWebViewUtils;
 
-let userAgentCache
+let userAgentCache: string | undefined
 
 function getUserAgent() {
   if (typeof userAgentCache === 'undefined') {
     userAgentCache = getWebViewDefaultUserAgent() || ''
   }
-  return userAgentCache
+  return userAgentCache || ''
 }
 
 const codegenNativeCommands = codegenNativeCommandsUntyped as <T extends {}>(options: { supportedCommands: (keyof T)[] }) => T;
