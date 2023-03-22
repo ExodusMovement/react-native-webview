@@ -1,4 +1,4 @@
-import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef } from 'react';
+import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 
 import {
   Text,
@@ -29,13 +29,12 @@ import styles from './WebView.styles';
 
 const { getWebViewDefaultUserAgent } = NativeModules.RNCWebViewUtils;
 
-let userAgentCache: string | undefined
+let userAgentPromise: Promise<string> | undefined
 
-function getUserAgent() {
-  if (typeof userAgentCache === 'undefined') {
-    userAgentCache = getWebViewDefaultUserAgent() || ''
-  }
-  return userAgentCache || ''
+async function getUserAgent(): Promise<string> {
+  if (!userAgentPromise) userAgentPromise = getWebViewDefaultUserAgent()
+  const userAgent = await userAgentPromise
+  return userAgent || 'unknown'
 }
 
 const codegenNativeCommands = codegenNativeCommandsUntyped as <T extends {}>(options: { supportedCommands: (keyof T)[] }) => T;
@@ -141,7 +140,13 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
     BatchedBridge.registerCallableModule(messagingModuleName, directEventCallbacks);
   }, [messagingModuleName, directEventCallbacks])
 
-  const userAgent = getUserAgent()
+  const [userAgent, setUserAgent] = useState<string>()
+
+  useEffect(() => {
+    getUserAgent().then(setUserAgent)
+  }, [])
+
+  if (!userAgent) return null // stop the rendering until userAgent is known
   const version = userAgent.match(/chrome\/((?:[0-9]+\.)+[0-9]+)/i)?.[1]
   if (!(versionPasses(version, minimumChromeVersion) && versionPasses(version, hardMinimumChromeVersion))) {
     return (
