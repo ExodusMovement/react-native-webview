@@ -1,4 +1,7 @@
-import WebView from './lib/WebView';
+import WebView, {
+  RNCWebViewUtils,
+  getWebViewDefaultUserAgent,
+} from './lib/WebView';
 
-export { WebView };
+export { WebView, RNCWebViewUtils, getWebViewDefaultUserAgent };
 export default WebView;
