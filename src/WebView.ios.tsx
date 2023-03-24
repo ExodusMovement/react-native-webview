@@ -64,7 +64,7 @@ const useSharedProcessPool = false;
 const sharedCookiesEnabled = false;
 const enableApplePay = false;
 const dataDetectorTypes = 'none';
-const hardMinimumIOSVersion = '12.5.6' // TODO: determinime a good lower bound
+const hardMinimumIOSVersion = '12.5.6 <13, 13.6.1 <14, 14.8.1 <15, 15.7.1'
 
 const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
   javaScriptEnabled = true,
