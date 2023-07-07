@@ -50,11 +50,11 @@ const createOnShouldStartLoadWithRequest = (
 ) => {
   return ({ nativeEvent }: ShouldStartLoadRequestEvent) => {
     let shouldStart = true;
-    const { url, lockIdentifier } = nativeEvent;
+    const { url, lockIdentifier, isTopFrame } = nativeEvent;
 
     if (!_passesWhitelist(compileWhitelist(originWhitelist), url)) {
       Linking.canOpenURL(url).then((supported) => {
-        if (supported && /^https:\/\//.test(url)) {
+        if (supported && isTopFrame && /^https:\/\//.test(url)) {
           return Linking.openURL(url);
         }
         console.warn(`Can't open url: ${url}`);
