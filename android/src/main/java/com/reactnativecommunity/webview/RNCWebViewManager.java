@@ -749,6 +749,8 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
         final WritableMap event = createWebViewEvent(view, url);
         event.putInt("lockIdentifier", lockIdentifier);
+        // Android does not raise shouldOverrideUrlLoading for inner frames
+        event.putBoolean("isTopFrame", true);
         rncWebView.sendDirectMessage("onShouldStartLoadWithRequest", event);
 
         try {
