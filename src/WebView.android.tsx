@@ -2,8 +2,10 @@ import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo
 
 import {
   Text,
+  Image,
   View,
   NativeModules,
+  ImageSourcePropType,
 } from 'react-native';
 
 import BatchedBridge from 'react-native/Libraries/BatchedBridge/BatchedBridge';
@@ -42,6 +44,8 @@ const codegenNativeCommands = codegenNativeCommandsUntyped as <T extends {}>(opt
 const Commands = codegenNativeCommands({
   supportedCommands: ['goBack', 'goForward', 'reload', 'stopLoading', /* 'injectJavaScript', */ 'requestFocus', 'postMessage', 'clearFormData', 'clearCache', 'clearHistory', 'loadUrl'],
 });
+
+const { resolveAssetSource } = Image;
 
 /**
  * A simple counter to uniquely identify WebView instances. Do not use this for anything else.
@@ -211,7 +215,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
     
     ref={webViewRef}
     // TODO: find a better way to type this.
-    source={source}
+    source={resolveAssetSource(source as ImageSourcePropType)}
     style={webViewStyles}
     overScrollMode={overScrollMode}
     javaScriptEnabled={javaScriptEnabled}
