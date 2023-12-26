@@ -430,6 +430,12 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   @ReactProp(name = "source")
   public void setSource(WebView view, @Nullable ReadableMap source) {
     if (source != null) {
+      if (source.hasKey("html")) {
+        String html = source.getString("html");
+        String baseUrl = source.hasKey("baseUrl") ? source.getString("baseUrl") : "";
+        view.loadDataWithBaseURL(baseUrl, html, HTML_MIME_TYPE, HTML_ENCODING, null);
+        return;
+      }
       if (source.hasKey("uri")) {
         String url = source.getString("uri");
         String previousUrl = view.getUrl();
