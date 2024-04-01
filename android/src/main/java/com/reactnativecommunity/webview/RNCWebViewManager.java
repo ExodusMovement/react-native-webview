@@ -338,6 +338,11 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     CookieManager.getInstance().setAcceptThirdPartyCookies(view, enabled);
   }
 
+  @ReactProp(name = "webviewDebuggingEnabled")
+  public void setWebviewDebuggingEnabled(WebView view, boolean value) {
+      ((RNCWebView) view).setWebContentsDebuggingEnabled(value);
+  }
+
   @ReactProp(name = "textZoom")
   public void setTextZoom(WebView view, int value) {
     view.getSettings().setTextZoom(value);
