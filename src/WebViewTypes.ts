@@ -229,6 +229,7 @@ export interface CommonNativeWebViewProps extends ViewProps {
   injectedJavaScript?: string;
   injectedJavaScriptBeforeContentLoaded?: string;
   mediaPlaybackRequiresUserAction?: boolean;
+  webviewDebuggingEnabled?: boolean;
   messagingEnabled: boolean;
   onScroll?: (event: WebViewScrollEvent) => void;
   onLoadingError: (event: WebViewErrorEvent) => void;
@@ -886,6 +887,11 @@ export interface WebViewSharedProps extends ViewProps {
    */
   basicAuthCredential?: BasicAuthCredential;
 
+  /**
+   * Enables WebView remote debugging using Chrome (Android) or Safari (iOS).
+   */
+  webviewDebuggingEnabled?: boolean;
+  
   /**
    * Event metadata validation.
    */
