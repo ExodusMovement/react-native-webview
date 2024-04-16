@@ -53,7 +53,6 @@ let uniqueRef = 0;
  */
 const mediaPlaybackRequiresUserAction = true;
 // Android only
-const setSupportMultipleWindows = true;
 const mixedContentMode = 'never'
 const hardMinimumChromeVersion = '100.0' // TODO: determinime a good lower bound
 
@@ -67,6 +66,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
   androidHardwareAccelerationDisabled = false,
   androidLayerType = "none",
   originWhitelist = defaultOriginWhitelist,
+  setSupportMultipleWindows = true,
   setBuiltInZoomControls = true,
   setDisplayZoomControls = false,
   nestedScrollEnabled = false,
