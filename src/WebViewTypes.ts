@@ -10,6 +10,7 @@ import {
   UIManagerStatic,
   NativeScrollEvent,
 } from 'react-native';
+// @ts-expect-error react-native doesn't have this type
 import type { DirectEventHandler } from 'react-native/Libraries/Types/CodegenTypes';
 
 type WebViewCommands =
