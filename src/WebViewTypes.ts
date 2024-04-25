@@ -10,8 +10,6 @@ import {
   UIManagerStatic,
   NativeScrollEvent,
 } from 'react-native';
-// @ts-expect-error react-native doesn't have this type
-import type { DirectEventHandler } from 'react-native/Libraries/Types/CodegenTypes';
 
 type WebViewCommands =
   | 'goForward'
@@ -243,7 +241,7 @@ export interface CommonNativeWebViewProps extends ViewProps {
   onLoadingProgress: (event: WebViewProgressEvent) => void;
   onLoadingStart: (event: WebViewNavigationEvent) => void;
   onMessage: (event: WebViewMessageEvent) => void;
-  onOpenWindow?: DirectEventHandler<WebViewOpenWindowEvent>;
+  onOpenWindow?: (event: WebViewOpenWindowEvent) => void;
   onShouldStartLoadWithRequest: (event: ShouldStartLoadRequestEvent) => void;
   showsHorizontalScrollIndicator?: boolean;
   showsVerticalScrollIndicator?: boolean;
