@@ -9,6 +9,7 @@ import {
   WebViewMessageEvent,
   WebViewMessage,
   WebViewNavigationEvent,
+  WebViewOpenWindowEvent,
   WebViewProgressEvent,
   WebViewNativeEvent,
 } from './WebViewTypes';
@@ -104,6 +105,7 @@ export const useWebWiewLogic = ({
   onLoadEnd,
   onError,
   onMessageProp,
+  onOpenWindowProp,
   originWhitelist,
   onShouldStartLoadWithRequestProp,
   onShouldStartLoadWithRequestCallback,
@@ -116,6 +118,7 @@ export const useWebWiewLogic = ({
   onLoadEnd?: (event: WebViewNavigationEvent | WebViewErrorEvent) => void;
   onError?: (event: WebViewErrorEvent) => void;
   onMessageProp?: (event: WebViewMessage) => void;
+  onOpenWindowProp?: (event: WebViewOpenWindowEvent) => void;
   originWhitelist: readonly string[];
   onShouldStartLoadWithRequestProp?: OnShouldStartLoadWithRequest;
   onShouldStartLoadWithRequestCallback: (shouldStart: boolean, url: string, lockIdentifier?: number | undefined) => void;
@@ -209,6 +212,12 @@ export const useWebWiewLogic = ({
     )
   , [originWhitelist, onShouldStartLoadWithRequestProp, onShouldStartLoadWithRequestCallback])
 
+  // Android Only
+  const onOpenWindow = useCallback((event: WebViewOpenWindowEvent) => {
+    onOpenWindowProp?.(event);
+  }, [onOpenWindowProp]);
+  // !Android Only
+
   return {
     onShouldStartLoadWithRequest,
     onLoadingStart,
@@ -216,6 +225,7 @@ export const useWebWiewLogic = ({
     onLoadingError,
     onLoadingFinish,
     onMessage,
+    onOpenWindow,
     passesWhitelist,
     viewState,
     setViewState,

@@ -76,6 +76,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
   onLoad,
   onLoadEnd,
   onMessage: onMessageProp,
+  onOpenWindow: onOpenWindowProp,
   renderLoading,
   renderError,
   style,
@@ -101,12 +102,13 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
     }
   }, []);
 
-  const { onLoadingStart, onShouldStartLoadWithRequest, onMessage, viewState, setViewState, lastErrorEvent, onLoadingError, onLoadingFinish, onLoadingProgress, passesWhitelist } = useWebWiewLogic({
+  const { onLoadingStart, onShouldStartLoadWithRequest, onMessage, viewState, setViewState, lastErrorEvent, onLoadingError, onLoadingFinish, onLoadingProgress, onOpenWindow, passesWhitelist } = useWebWiewLogic({
     onLoad,
     onError,
     onLoadEnd,
     onLoadStart,
     onMessageProp,
+    onOpenWindowProp,
     startInLoadingState,
     originWhitelist,
     onShouldStartLoadWithRequestProp,
@@ -207,6 +209,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
     onLoadingProgress={onLoadingProgress}
     onLoadingStart={onLoadingStart}
     onMessage={onMessage}
+    onOpenWindow={onOpenWindow}
     onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
     
     ref={webViewRef}
