@@ -80,6 +80,10 @@ export interface WebViewNativeEvent {
   lockIdentifier: number;
 }
 
+export type WebViewOpenWindowEvent = Readonly<{
+  targetUrl: string;
+}>
+
 export interface WebViewNativeProgressEvent extends WebViewNativeEvent {
   progress: number;
 }
@@ -237,6 +241,7 @@ export interface CommonNativeWebViewProps extends ViewProps {
   onLoadingProgress: (event: WebViewProgressEvent) => void;
   onLoadingStart: (event: WebViewNavigationEvent) => void;
   onMessage: (event: WebViewMessageEvent) => void;
+  onOpenWindow?: (event: WebViewOpenWindowEvent) => void;
   onShouldStartLoadWithRequest: (event: ShouldStartLoadRequestEvent) => void;
   showsHorizontalScrollIndicator?: boolean;
   showsVerticalScrollIndicator?: boolean;
@@ -571,6 +576,16 @@ export interface IOSWebViewProps extends WebViewSharedProps {
 
 export interface AndroidWebViewProps extends WebViewSharedProps {
   onContentSizeChange?: (event: WebViewEvent) => void;
+
+  /**
+   * Function that is invoked when the `WebView` should open a new window.
+   * 
+   * This happens when the JS calls `window.open('http://someurl', '_blank')`
+   * or when the user clicks on a `<a href="http://someurl" target="_blank">` link.
+   *
+   * @platform android
+   */
+  onOpenWindow?: (event: WebViewOpenWindowEvent) => void;
 
   /**
    * https://developer.android.com/reference/android/webkit/WebSettings.html#setCacheMode(int)
