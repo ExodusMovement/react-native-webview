@@ -1047,7 +1047,75 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void onPermissionRequest(final PermissionRequest request) {
-      request.deny();
+      grantedPermissions = new ArrayList<>();
+
+      ArrayList<String> requestedAndroidPermissions = new ArrayList<>();
+
+      for (String requestedResource : request.getResources()) {
+        String androidPermission = null;
+
+        if (requestedResource.equals(PermissionRequest.RESOURCE_AUDIO_CAPTURE)) {
+          androidPermission = Manifest.permission.RECORD_AUDIO;
+        } else if (requestedResource.equals(PermissionRequest.RESOURCE_VIDEO_CAPTURE)) {
+          androidPermission = Manifest.permission.CAMERA;
+        } else {
+          continue;
+        }
+
+        if (androidPermission != null) {
+          if (ContextCompat.checkSelfPermission(mReactContext,
+              androidPermission) == PackageManager.PERMISSION_GRANTED) {
+            grantedPermissions.add(requestedResource);
+          } else {
+            requestedAndroidPermissions.add(androidPermission);
+          }
+        }
+      }
+
+      // If all the permissions are already granted, send the response to the WebView
+      // synchronously
+      if (requestedAndroidPermissions.isEmpty()) {
+        if (grantedPermissions.isEmpty()) {
+          request.deny();
+        } else {
+          request.grant(grantedPermissions.toArray(new String[0]));
+        }
+        grantedPermissions = null;
+        return;
+      }
+
+      // Otherwise, ask to Android System for native permissions asynchronously
+      PermissionAwareActivity activity = getPermissionAwareActivity();
+      activity.requestPermissions(
+          requestedAndroidPermissions.toArray(new String[0]),
+          COMMON_PERMISSION_REQUEST,
+          new PermissionListener() {
+            @Override
+            public boolean onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+              if (requestCode != COMMON_PERMISSION_REQUEST) {
+                return false;
+              }
+
+              for (int i = 0; i < permissions.length; i++) {
+                if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
+                  if (permissions[i].equals(Manifest.permission.RECORD_AUDIO)) {
+                    grantedPermissions.add(PermissionRequest.RESOURCE_AUDIO_CAPTURE);
+                  } else if (permissions[i].equals(Manifest.permission.CAMERA)) {
+                    grantedPermissions.add(PermissionRequest.RESOURCE_VIDEO_CAPTURE);
+                  }
+                }
+              }
+
+              if (grantedPermissions.size() == requestedAndroidPermissions.size()) {
+                request.grant(grantedPermissions.toArray(new String[0]));
+              } else {
+                request.deny();
+              }
+
+              grantedPermissions = null;
+              return true;
+            }
+          });
     }
 
 
