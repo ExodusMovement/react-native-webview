@@ -120,17 +120,20 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
   });
 
   useImperativeHandle(ref, () => ({
-    goForward: () => Commands.goForward(webViewRef.current),
-    goBack: () => Commands.goBack(webViewRef.current),
+    goForward: () => webViewRef.current && Commands.goForward(webViewRef.current),
+    goBack: () => webViewRef.current && Commands.goBack(webViewRef.current),
     reload: () => {
       setViewState(
         'LOADING',
-      ); Commands.reload(webViewRef.current)
+      ); 
+      if (webViewRef.current) {
+        Commands.reload(webViewRef.current)
+      }
     },
-    stopLoading: () => Commands.stopLoading(webViewRef.current),
-    postMessage: (data: string) => Commands.postMessage(webViewRef.current, data),
+    stopLoading: () => webViewRef.current && Commands.stopLoading(webViewRef.current),
+    postMessage: (data: string) => webViewRef.current && Commands.postMessage(webViewRef.current, data),
     // injectJavaScript: (data: string) => Commands.injectJavaScript(webViewRef.current, data),
-    requestFocus: () => Commands.requestFocus(webViewRef.current),
+    requestFocus: () => webViewRef.current && Commands.requestFocus(webViewRef.current),
   }), [setViewState, webViewRef]);
 
 

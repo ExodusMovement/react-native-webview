@@ -118,20 +118,23 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
   })
 
   useImperativeHandle(ref, () => ({
-    goForward: () => Commands.goForward(webViewRef.current),
-    goBack: () => Commands.goBack(webViewRef.current),
+    goForward: () => webViewRef.current && Commands.goForward(webViewRef.current),
+    goBack: () => webViewRef.current && Commands.goBack(webViewRef.current),
     reload: () => {
       setViewState(
         'LOADING',
-      ); Commands.reload(webViewRef.current)
+      ); 
+      if (webViewRef.current) {
+        Commands.reload(webViewRef.current)
+      }
     },
-    stopLoading: () => Commands.stopLoading(webViewRef.current),
-    postMessage: (data: string) => Commands.postMessage(webViewRef.current, data),
+    stopLoading: () => webViewRef.current && Commands.stopLoading(webViewRef.current),
+    postMessage: (data: string) => webViewRef.current && Commands.postMessage(webViewRef.current, data),
     // injectJavaScript: (data: string) => Commands.injectJavaScript(webViewRef.current, data),
-    requestFocus: () => Commands.requestFocus(webViewRef.current),
-    clearFormData: () => Commands.clearFormData(webViewRef.current),
-    clearCache: (includeDiskFiles: boolean) => Commands.clearCache(webViewRef.current, includeDiskFiles),
-    clearHistory: () => Commands.clearHistory(webViewRef.current),
+    requestFocus: () => webViewRef.current && Commands.requestFocus(webViewRef.current),
+    clearFormData: () => webViewRef.current && Commands.clearFormData(webViewRef.current),
+    clearCache: (includeDiskFiles: boolean) => webViewRef.current && Commands.clearCache(webViewRef.current, includeDiskFiles),
+    clearHistory: () => webViewRef.current && Commands.clearHistory(webViewRef.current),
   }), [setViewState, webViewRef]);
 
   const directEventCallbacks = useMemo(() => ({
