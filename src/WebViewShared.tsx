@@ -55,7 +55,7 @@ const createOnShouldStartLoadWithRequest = (
 
     if (!_passesWhitelist(compileWhitelist(originWhitelist), url)) {
       Linking.canOpenURL(url).then((supported) => {
-        if (supported && isTopFrame && /^https:\/\//.test(url)) {
+        if (supported && isTopFrame) {
           return Linking.openURL(url);
         }
         console.warn(`Can't open url: ${url}`);
