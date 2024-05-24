@@ -163,11 +163,11 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   protected @Nullable String mDownloadingMessage = null;
   protected @Nullable String mLackPermissionToDownloadMessage = null;
 
-  private static Set<String> originWhitelist;
+  private static Set<String> cameraPermissionOriginWhitelist;
 
   public RNCWebViewManager() {
-    originWhitelist = new HashSet<>();
-    originWhitelist.add("https://alchemy.veriff.com/");
+    cameraPermissionOriginWhitelist = new HashSet<>();
+    cameraPermissionOriginWhitelist.add("https://alchemy.veriff.com/");
 
     mWebViewConfig = new WebViewConfig() {
       public void configWebView(WebView webView) {
@@ -1060,7 +1060,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         String androidPermission = null;
 
         if (requestedResource.equals(PermissionRequest.RESOURCE_VIDEO_CAPTURE)
-            && originWhitelist.contains(request.getOrigin().toString())) {
+            && cameraPermissionOriginWhitelist.contains(request.getOrigin().toString())) {
           androidPermission = Manifest.permission.CAMERA;
         } else {
           continue;
