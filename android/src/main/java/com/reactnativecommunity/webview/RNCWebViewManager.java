@@ -98,6 +98,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
+
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -163,7 +166,12 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   protected @Nullable String mDownloadingMessage = null;
   protected @Nullable String mLackPermissionToDownloadMessage = null;
 
+  private static Set<String> cameraPermissionOriginWhitelist;
+
   public RNCWebViewManager() {
+    cameraPermissionOriginWhitelist = new HashSet<>();
+    cameraPermissionOriginWhitelist.add("https://alchemy.veriff.com/");
+
     mWebViewConfig = new WebViewConfig() {
       public void configWebView(WebView webView) {
       }
@@ -1054,7 +1062,8 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       for (String requestedResource : request.getResources()) {
         String androidPermission = null;
 
-        if (requestedResource.equals(PermissionRequest.RESOURCE_VIDEO_CAPTURE)) {
+        if (requestedResource.equals(PermissionRequest.RESOURCE_VIDEO_CAPTURE)
+            && cameraPermissionOriginWhitelist.contains(request.getOrigin().toString())) {
           androidPermission = Manifest.permission.CAMERA;
         } else {
           continue;
