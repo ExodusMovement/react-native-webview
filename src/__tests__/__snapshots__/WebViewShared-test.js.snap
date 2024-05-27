@@ -6,3 +6,9 @@ Array [
   "https://*",
 ]
 `;
+
+exports[`WebViewShared exports defaultDeeplinkWhitelist 1`] = `
+Array [
+  "https://*",
+]
+`;

@@ -886,6 +886,13 @@ export interface WebViewSharedProps extends ViewProps {
   readonly originWhitelist?: string[];
 
   /**
+   * List of regex strings to allow being deep linked to. The strings allow
+   * wildcards and get matched against the full URL.
+   * The default behavior is to not allow any.
+   */
+    readonly deeplinkWhitelist?: string[];
+
+  /**
    * Function that allows custom handling of any web view requests. Return
    * `true` from the function to continue loading the request and `false`
    * to stop loading. The `navigationType` is always `other` on android.

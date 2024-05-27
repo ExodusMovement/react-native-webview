@@ -2,6 +2,7 @@ import { Linking } from 'react-native';
 
 import {
   defaultOriginWhitelist,
+  defaultDeeplinkWhitelist,
   createOnShouldStartLoadWithRequest,
 } from '../WebViewShared';
 
@@ -35,6 +36,10 @@ describe('WebViewShared', () => {
     expect(defaultOriginWhitelist).toMatchSnapshot();
   });
 
+  test('exports defaultDeeplinkWhitelist', () => {
+    expect(defaultDeeplinkWhitelist).toMatchSnapshot();
+  });
+
   describe('createOnShouldStartLoadWithRequest', () => {
     const alwaysTrueOnShouldStartLoadWithRequest = (nativeEvent) => {
       return true;
@@ -50,6 +55,7 @@ describe('WebViewShared', () => {
       const onShouldStartLoadWithRequest = createOnShouldStartLoadWithRequest(
         loadRequest,
         defaultOriginWhitelist,
+        defaultDeeplinkWhitelist,
       );
 
       onShouldStartLoadWithRequest({ nativeEvent: { url: 'https://www.example.com/', lockIdentifier: 1 } });
@@ -64,6 +70,7 @@ describe('WebViewShared', () => {
       const onShouldStartLoadWithRequest = createOnShouldStartLoadWithRequest(
         loadRequest,
         defaultOriginWhitelist,
+        defaultDeeplinkWhitelist,
       );
 
       onShouldStartLoadWithRequest({ nativeEvent: { url: 'invalid://example.com/', lockIdentifier: 2 } });
@@ -78,6 +85,7 @@ describe('WebViewShared', () => {
       const onShouldStartLoadWithRequest = createOnShouldStartLoadWithRequest(
         loadRequest,
         defaultOriginWhitelist,
+        defaultDeeplinkWhitelist,
         alwaysTrueOnShouldStartLoadWithRequest,
       );
 
@@ -93,6 +101,7 @@ describe('WebViewShared', () => {
       const onShouldStartLoadWithRequest = createOnShouldStartLoadWithRequest(
         loadRequest,
         defaultOriginWhitelist,
+        defaultDeeplinkWhitelist,
         alwaysTrueOnShouldStartLoadWithRequest,
       );
 
@@ -111,6 +120,7 @@ describe('WebViewShared', () => {
       const onShouldStartLoadWithRequest = createOnShouldStartLoadWithRequest(
         loadRequest,
         defaultOriginWhitelist,
+        defaultDeeplinkWhitelist,
         alwaysFalseOnShouldStartLoadWithRequest,
       );
 

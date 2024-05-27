@@ -12,6 +12,7 @@ import codegenNativeCommandsUntyped from 'react-native/Libraries/Utilities/codeg
 import RNCWebView from "./WebViewNativeComponent.ios";
 import {
   defaultOriginWhitelist,
+  defaultDeeplinkWhitelist,
   defaultRenderError,
   defaultRenderLoading,
   useWebWiewLogic,
@@ -70,6 +71,7 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
   javaScriptEnabled = true,
   cacheEnabled = true,
   originWhitelist = defaultOriginWhitelist,
+  deeplinkWhitelist = defaultDeeplinkWhitelist,
   textInteractionEnabled= true,
   injectedJavaScript,
   injectedJavaScriptBeforeContentLoaded,
@@ -113,6 +115,7 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
     onMessageProp,
     startInLoadingState,
     originWhitelist,
+    deeplinkWhitelist,
     onShouldStartLoadWithRequestProp,
     onShouldStartLoadWithRequestCallback,
     validateMeta,

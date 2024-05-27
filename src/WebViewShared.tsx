@@ -16,6 +16,7 @@ import {
 import styles from './WebView.styles';
 
 const defaultOriginWhitelist = ['https://*'] as const;
+const defaultDeeplinkWhitelist = ['https://*'] as const;
 
 const extractOrigin = (url: string): string => {
   const result = /^[A-Za-z][A-Za-z0-9+\-.]+:(\/\/)?[^/]*/.exec(url);
@@ -25,6 +26,13 @@ const extractOrigin = (url: string): string => {
 const originWhitelistToRegex = (originWhitelist: string): string =>
   `^${escapeStringRegexp(originWhitelist).replace(/\\\*/g, '.*')}$`;
 
+const _passesAnyFromWhitelist= (
+  compiledWhitelist: readonly string[],
+  value: string,
+) => {
+  return compiledWhitelist.some(x => new RegExp(x).test(value));
+};
+
 const _passesWhitelist = (
   compiledWhitelist: readonly string[],
   url: string,
@@ -32,7 +40,7 @@ const _passesWhitelist = (
   const origin = extractOrigin(url);
   if (!origin) return false;
   if (origin !== new URL(url).origin) return null;
-  return compiledWhitelist.some(x => new RegExp(x).test(origin));
+  return _passesAnyFromWhitelist(compiledWhitelist,  origin)
 };
 
 const compileWhitelist = (
@@ -47,6 +55,7 @@ const createOnShouldStartLoadWithRequest = (
     lockIdentifier: number,
   ) => void,
   originWhitelist: readonly string[],
+  deepLinkWhitelist: readonly string[],
   onShouldStartLoadWithRequest?: OnShouldStartLoadWithRequest,
 ) => {
   return ({ nativeEvent }: ShouldStartLoadRequestEvent) => {
@@ -54,15 +63,23 @@ const createOnShouldStartLoadWithRequest = (
     const { url, lockIdentifier, isTopFrame } = nativeEvent;
 
     if (!_passesWhitelist(compileWhitelist(originWhitelist), url)) {
-      Linking.canOpenURL(url).then((supported) => {
-        if (supported && isTopFrame) {
-          return Linking.openURL(url);
-        }
-        console.warn(`Can't open url: ${url}`);
-        return undefined;
-      }).catch(e => {
-        console.warn('Error opening URL: ', e);
-      });
+      const _deeplinkWhitelist = (deepLinkWhitelist || []).map(originWhitelistToRegex)
+      const allowedToOpenDeepLink = _passesAnyFromWhitelist(_deeplinkWhitelist, url)
+
+      if (allowedToOpenDeepLink) {
+        Linking.canOpenURL(url).then((supported) => {
+          if (supported && isTopFrame) {
+            return Linking.openURL(url);
+          }
+          console.warn(`Can't open url: ${url}`);
+          return undefined;
+        }).catch(e => {
+          console.warn('Error opening URL: ', e);
+        });
+      } else {
+        console.warn(`Failed to pass whitelist deep link url: ${url}`);
+      }
+
       shouldStart = false;
     } else if (onShouldStartLoadWithRequest) {
       shouldStart = onShouldStartLoadWithRequest(nativeEvent);
@@ -92,6 +109,7 @@ const defaultRenderError = (
 
 export {
   defaultOriginWhitelist,
+  defaultDeeplinkWhitelist,
   createOnShouldStartLoadWithRequest,
   defaultRenderLoading,
   defaultRenderError,
@@ -107,6 +125,7 @@ export const useWebWiewLogic = ({
   onMessageProp,
   onOpenWindowProp,
   originWhitelist,
+  deeplinkWhitelist,
   onShouldStartLoadWithRequestProp,
   onShouldStartLoadWithRequestCallback,
   validateMeta,
@@ -120,6 +139,7 @@ export const useWebWiewLogic = ({
   onMessageProp?: (event: WebViewMessage) => void;
   onOpenWindowProp?: (event: WebViewOpenWindowEvent) => void;
   originWhitelist: readonly string[];
+  deeplinkWhitelist: readonly string[];
   onShouldStartLoadWithRequestProp?: OnShouldStartLoadWithRequest;
   onShouldStartLoadWithRequestCallback: (shouldStart: boolean, url: string, lockIdentifier?: number | undefined) => void;
   validateMeta: (event: WebViewNativeEvent) => WebViewNativeEvent;
@@ -208,9 +228,10 @@ export const useWebWiewLogic = ({
   const onShouldStartLoadWithRequest = useMemo(() =>  createOnShouldStartLoadWithRequest(
       onShouldStartLoadWithRequestCallback,
       originWhitelist,
+      deeplinkWhitelist,
       onShouldStartLoadWithRequestProp,
     )
-  , [originWhitelist, onShouldStartLoadWithRequestProp, onShouldStartLoadWithRequestCallback])
+  , [originWhitelist, deeplinkWhitelist, onShouldStartLoadWithRequestProp, onShouldStartLoadWithRequestCallback])
 
   // Android Only
   const onOpenWindow = useCallback((event: WebViewOpenWindowEvent) => {
