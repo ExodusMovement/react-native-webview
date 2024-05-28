@@ -130,13 +130,20 @@ describe('WebViewShared', () => {
       expect(Linking.openURL).toHaveBeenCalledWith(good)
     });
 
-    test('Linking.openURL with default blocklist', async () => {
+    test.each([
+      'javascript:alert(1)',
+      'jAvAsCrIpT:alert(1)',
+      'file:///Users/user/Documents/projects/index.html',
+      'fIlE:///Users/user/Documents/projects/index.html',
+      'http://google.com',
+      'hTtP://google.com'
+    ])('Linking.openURL with default blocklist %s', async (bad) => {
       const onShouldStartLoadWithRequest = createOnShouldStartLoadWithRequest(
         loadRequest,
         ['https://*'],
         ['bitcoin:*'],
       );
-      const bad = 'javascript:alert(1)'
+
       onShouldStartLoadWithRequest({ nativeEvent: { url: bad, isTopFrame: true, lockIdentifier: 1 } });
       
       await flushPromises();

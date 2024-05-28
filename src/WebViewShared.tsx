@@ -17,7 +17,7 @@ import styles from './WebView.styles';
 
 const defaultOriginWhitelist = ['https://*'] as const;
 const defaultDeeplinkWhitelist = ['https://*'] as const;
-const defaultDeeplinkBlocklist = [/^http:/, /^file:/, /^javascript:/] as const;
+const defaultDeeplinkBlocklist = [/^http:/i, /^file:/i, /^javascript:/i] as const;
 
 const extractOrigin = (url: string): string => {
   const result = /^[A-Za-z][A-Za-z0-9+\-.]+:(\/\/)?[^/]*/.exec(url);
