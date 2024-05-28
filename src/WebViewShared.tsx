@@ -17,7 +17,7 @@ import styles from './WebView.styles';
 
 const defaultOriginWhitelist = ['https://*'] as const;
 const defaultDeeplinkWhitelist = ['https://*'] as const;
-const defaultDeeplinkBlocklist = [`http:`, `file:`, `javascript:`] as const;
+const defaultDeeplinkBlocklist = [/^http:/, /^file:/, /^javascript:/] as const;
 
 const extractOrigin = (url: string): string => {
   const result = /^[A-Za-z][A-Za-z0-9+\-.]+:(\/\/)?[^/]*/.exec(url);
@@ -28,7 +28,7 @@ const stringWhitelistToRegex = (originWhitelist: string): string =>
   `^${escapeStringRegexp(originWhitelist).replace(/\\\*/g, '.*')}$`;
 
 const matchWithRegexList = (
-  compiledWhitelist: readonly string[],
+  compiledWhitelist: readonly string[] | readonly RegExp[],
   value: string,
 ) => {
   return compiledWhitelist.some(x => new RegExp(x).test(value));
@@ -64,8 +64,7 @@ const createOnShouldStartLoadWithRequest = (
     const { url, lockIdentifier, isTopFrame } = nativeEvent;
 
     if (!_passesWhitelist(compileWhitelist(originWhitelist), url)) {
-      const _deeplinkBlocklist = defaultDeeplinkBlocklist.map(stringWhitelistToRegex)
-      const foundMatchInBlocklist = matchWithRegexList(_deeplinkBlocklist, url)
+      const foundMatchInBlocklist = matchWithRegexList(defaultDeeplinkBlocklist, url)
 
       const _deeplinkWhitelist = (deepLinkWhitelist || []).map(stringWhitelistToRegex)
       const foundMatchInAllowlist = matchWithRegexList(_deeplinkWhitelist, url)
