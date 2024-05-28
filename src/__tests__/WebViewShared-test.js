@@ -115,6 +115,49 @@ describe('WebViewShared', () => {
       expect(loadRequest).toHaveBeenLastCalledWith(false, 'invalid://example.com/', 1);
     });
 
+    test('Linking.openURL with limited whitelist', async () => {
+      const onShouldStartLoadWithRequest = createOnShouldStartLoadWithRequest(
+        loadRequest,
+        ['https://*'],
+        ['bitcoin:*'],
+      );
+
+      const good = 'bitcoin:175tWpb8K1S7NmH4Zx6rewF9WQrcZv245W?amount=50&label=Luke-Jr&message=Donation%20for%20project%20xyz'
+      onShouldStartLoadWithRequest({ nativeEvent: { url: good, isTopFrame: true, lockIdentifier: 1 } });
+      
+      await flushPromises();
+
+      expect(Linking.openURL).toHaveBeenCalledWith(good)
+    });
+
+    test('Linking.openURL with default blocklist', async () => {
+      const onShouldStartLoadWithRequest = createOnShouldStartLoadWithRequest(
+        loadRequest,
+        ['https://*'],
+        ['bitcoin:*'],
+      );
+      const bad = 'javascript:alert(1)'
+      onShouldStartLoadWithRequest({ nativeEvent: { url: bad, isTopFrame: true, lockIdentifier: 1 } });
+      
+      await flushPromises();
+
+      expect(Linking.openURL).not.toHaveBeenCalledWith(bad)
+    });
+
+    test('Linking.openURL with hardcoded blocklist should take priority over whitelist', async () => {
+      const onShouldStartLoadWithRequest = createOnShouldStartLoadWithRequest(
+        loadRequest,
+        [],
+        ['javascript:*'],
+      );
+      const bad = 'javascript:alert(1)'
+      onShouldStartLoadWithRequest({ nativeEvent: { url: bad, isTopFrame: true, lockIdentifier: 1 } });
+      
+      await flushPromises();
+
+      expect(Linking.openURL).not.toHaveBeenCalledWith(bad)
+    });
+
     test('loadRequest with false onShouldStartLoadWithRequest override is called', async () => {
       const onShouldStartLoadWithRequest = createOnShouldStartLoadWithRequest(
         loadRequest,
