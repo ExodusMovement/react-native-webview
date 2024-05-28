@@ -2,7 +2,6 @@
 
 exports[`WebViewShared exports defaultOriginWhitelist 1`] = `
 Array [
-  "http://*",
   "https://*",
 ]
 `;

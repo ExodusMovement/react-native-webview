@@ -70,10 +70,10 @@ describe('WebViewShared', () => {
       const onShouldStartLoadWithRequest = createOnShouldStartLoadWithRequest(
         loadRequest,
         defaultOriginWhitelist,
-        defaultDeeplinkWhitelist,
+        ['invalid://*'],
       );
 
-      onShouldStartLoadWithRequest({ nativeEvent: { url: 'invalid://example.com/', lockIdentifier: 2 } });
+      onShouldStartLoadWithRequest({ nativeEvent: { url: 'invalid://example.com/', isTopFrame: true, lockIdentifier: 2 } });
       
       await flushPromises();
 
@@ -89,7 +89,7 @@ describe('WebViewShared', () => {
         alwaysTrueOnShouldStartLoadWithRequest,
       );
 
-      onShouldStartLoadWithRequest({ nativeEvent: { url: 'https://www.example.com/', lockIdentifier: 1 } });
+      onShouldStartLoadWithRequest({ nativeEvent: { url: 'https://www.example.com/', isTopFrame: true, lockIdentifier: 1 } });
 
       await flushPromises();
 
@@ -101,12 +101,11 @@ describe('WebViewShared', () => {
       const onShouldStartLoadWithRequest = createOnShouldStartLoadWithRequest(
         loadRequest,
         defaultOriginWhitelist,
-        defaultDeeplinkWhitelist,
+        ['invalid://*'],
         alwaysTrueOnShouldStartLoadWithRequest,
       );
 
-      var a = 10;
-      onShouldStartLoadWithRequest({ nativeEvent: { url: 'invalid://example.com/', lockIdentifier: 1 } });
+      onShouldStartLoadWithRequest({ nativeEvent: { url: 'invalid://example.com/', isTopFrame: true, lockIdentifier: 1 } });
 
       await flushPromises();
 
@@ -124,7 +123,7 @@ describe('WebViewShared', () => {
         alwaysFalseOnShouldStartLoadWithRequest,
       );
 
-      onShouldStartLoadWithRequest({ nativeEvent: { url: 'https://www.example.com/', lockIdentifier: 1 } });
+      onShouldStartLoadWithRequest({ nativeEvent: { url: 'https://www.example.com/', isTopFrame: true, lockIdentifier: 1 } });
 
       await flushPromises();
 
@@ -136,30 +135,31 @@ describe('WebViewShared', () => {
       const onShouldStartLoadWithRequest = createOnShouldStartLoadWithRequest(
         loadRequest,
         ['https://*'],
+        ['git+https:*', 'fakehttps:*'],
       );
 
-      onShouldStartLoadWithRequest({ nativeEvent: { url: 'https://www.example.com/', lockIdentifier: 1 } });
+      onShouldStartLoadWithRequest({ nativeEvent: { url: 'https://www.example.com/', isTopFrame: true, lockIdentifier: 1 } });
       
       await flushPromises();
 
       expect(Linking.openURL).toHaveBeenCalledTimes(0);
       expect(loadRequest).toHaveBeenLastCalledWith(true, 'https://www.example.com/', 1);
 
-      onShouldStartLoadWithRequest({ nativeEvent: { url: 'http://insecure.com/', lockIdentifier: 2 } });
+      onShouldStartLoadWithRequest({ nativeEvent: { url: 'http://insecure.com/', isTopFrame: true, lockIdentifier: 2 } });
 
       await flushPromises();
 
-      expect(Linking.openURL).toHaveBeenLastCalledWith('http://insecure.com/');
+      expect(Linking.openURL).not.toHaveBeenLastCalledWith('http://insecure.com/');
       expect(loadRequest).toHaveBeenLastCalledWith(false, 'http://insecure.com/', 2);
 
-      onShouldStartLoadWithRequest({ nativeEvent: { url: 'git+https://insecure.com/', lockIdentifier: 3 } });
+      onShouldStartLoadWithRequest({ nativeEvent: { url: 'git+https://insecure.com/', isTopFrame: true, lockIdentifier: 3 } });
       
       await flushPromises();
 
       expect(Linking.openURL).toHaveBeenLastCalledWith('git+https://insecure.com/');
       expect(loadRequest).toHaveBeenLastCalledWith(false, 'git+https://insecure.com/', 3);
 
-      onShouldStartLoadWithRequest({ nativeEvent: { url: 'fakehttps://insecure.com/', lockIdentifier: 4 } });
+      onShouldStartLoadWithRequest({ nativeEvent: { url: 'fakehttps://insecure.com/', isTopFrame: true, lockIdentifier: 4 } });
       
       await flushPromises();
 
@@ -171,43 +171,49 @@ describe('WebViewShared', () => {
       const onShouldStartLoadWithRequest = createOnShouldStartLoadWithRequest(
           loadRequest,
           ['plus+https://*', 'DOT.https://*', 'dash-https://*', '0invalid://*', '+invalid://*'],
+          ['0invalid:*', '+invalid:*', 'FAKE+plus+https:*'],
       );
 
-      onShouldStartLoadWithRequest({ nativeEvent: { url: 'plus+https://www.example.com/', lockIdentifier: 1 } });
-      
-      await flushPromises();
-      expect(Linking.openURL).toHaveBeenCalledTimes(0);
-      expect(loadRequest).toHaveBeenLastCalledWith(true, 'plus+https://www.example.com/', 1);
-
-      onShouldStartLoadWithRequest({ nativeEvent: { url: 'DOT.https://www.example.com/', lockIdentifier: 2 } });
-
-      await flushPromises();
-
-      expect(Linking.openURL).toHaveBeenCalledTimes(0);
-      expect(loadRequest).toHaveBeenLastCalledWith(true, 'DOT.https://www.example.com/', 2);
-
-      onShouldStartLoadWithRequest({ nativeEvent: { url: 'dash-https://www.example.com/', lockIdentifier: 3 } });
+      onShouldStartLoadWithRequest({ nativeEvent: { url: 'plus+https://www.example.com/',  isTopFrame: true, lockIdentifier: 1 } });
       
       await flushPromises();
 
       expect(Linking.openURL).toHaveBeenCalledTimes(0);
-      expect(loadRequest).toHaveBeenLastCalledWith(true, 'dash-https://www.example.com/', 3);
+      // (new URL('plus+https://www.example.com/')).origin is null so it doesn't pass _passesWhitelist
+      expect(loadRequest).toHaveBeenLastCalledWith(false, 'plus+https://www.example.com/', 1);
+      
+      onShouldStartLoadWithRequest({ nativeEvent: { url: 'DOT.https://www.example.com/',  isTopFrame: true, lockIdentifier: 2 } });
 
-      onShouldStartLoadWithRequest({ nativeEvent: { url: '0invalid://www.example.com/', lockIdentifier: 4 } });
+      await flushPromises();
+
+      expect(Linking.openURL).toHaveBeenCalledTimes(0);
+      // (new URL('DOT.https://www.example.com/')).origin is null so it doesn't pass _passesWhitelist
+      expect(loadRequest).toHaveBeenLastCalledWith(false, 'DOT.https://www.example.com/', 2);
+      
+      onShouldStartLoadWithRequest({ nativeEvent: { url: 'dash-https://www.example.com/',  isTopFrame: true, lockIdentifier: 3 } });
+      
+      await flushPromises();
+
+      expect(Linking.openURL).toHaveBeenCalledTimes(0);
+      // (new URL('DOT.https://www.example.com/')).origin is null so it doesn't pass _passesWhitelist
+      expect(loadRequest).toHaveBeenLastCalledWith(false, 'dash-https://www.example.com/', 3);
+
+      onShouldStartLoadWithRequest({ nativeEvent: { url: '0invalid://www.example.com/', isTopFrame: true, lockIdentifier: 4 } });
 
       await flushPromises();
 
       expect(Linking.openURL).toHaveBeenLastCalledWith('0invalid://www.example.com/');
+      // (new URL('DOT.https://www.example.com/')).origin is null so it doesn't pass _passesWhitelist
       expect(loadRequest).toHaveBeenLastCalledWith(false, '0invalid://www.example.com/', 4);
 
-      onShouldStartLoadWithRequest({ nativeEvent: { url: '+invalid://www.example.com/', lockIdentifier: 5 } });
+      onShouldStartLoadWithRequest({ nativeEvent: { url: '+invalid://www.example.com/',  isTopFrame: true, lockIdentifier: 5 } });
       
       await flushPromises();
 
       expect(Linking.openURL).toHaveBeenLastCalledWith('+invalid://www.example.com/');
       expect(loadRequest).toHaveBeenLastCalledWith(false, '+invalid://www.example.com/', 5);
 
-      onShouldStartLoadWithRequest({ nativeEvent: { url: 'FAKE+plus+https://www.example.com/', lockIdentifier: 6 } });
+      onShouldStartLoadWithRequest({ nativeEvent: { url: 'FAKE+plus+https://www.example.com/',  isTopFrame: true, lockIdentifier: 6 } });
 
       await flushPromises();
 
