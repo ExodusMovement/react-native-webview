@@ -17,16 +17,17 @@ import styles from './WebView.styles';
 
 const defaultOriginWhitelist = ['https://*'] as const;
 const defaultDeeplinkWhitelist = ['https://*'] as const;
+const defaultDeeplinkBlocklist = [`http:`, `file:`, `javascript:`] as const;
 
 const extractOrigin = (url: string): string => {
   const result = /^[A-Za-z][A-Za-z0-9+\-.]+:(\/\/)?[^/]*/.exec(url);
   return result === null ? '' : result[0];
 };
 
-const originWhitelistToRegex = (originWhitelist: string): string =>
+const stringWhitelistToRegex = (originWhitelist: string): string =>
   `^${escapeStringRegexp(originWhitelist).replace(/\\\*/g, '.*')}$`;
 
-const _passesAnyFromWhitelist= (
+const matchWithRegexList = (
   compiledWhitelist: readonly string[],
   value: string,
 ) => {
@@ -40,13 +41,13 @@ const _passesWhitelist = (
   const origin = extractOrigin(url);
   if (!origin) return false;
   if (origin !== new URL(url).origin) return null;
-  return _passesAnyFromWhitelist(compiledWhitelist,  origin)
+  return matchWithRegexList(compiledWhitelist,  origin)
 };
 
 const compileWhitelist = (
   originWhitelist: readonly string[],
 ): readonly string[] =>
-  ['about:blank', ...(originWhitelist || [])].map(originWhitelistToRegex);
+  ['about:blank', ...(originWhitelist || [])].map(stringWhitelistToRegex);
 
 const createOnShouldStartLoadWithRequest = (
   loadRequest: (
@@ -63,10 +64,13 @@ const createOnShouldStartLoadWithRequest = (
     const { url, lockIdentifier, isTopFrame } = nativeEvent;
 
     if (!_passesWhitelist(compileWhitelist(originWhitelist), url)) {
-      const _deeplinkWhitelist = (deepLinkWhitelist || []).map(originWhitelistToRegex)
-      const allowedToOpenDeepLink = _passesAnyFromWhitelist(_deeplinkWhitelist, url)
+      const _deeplinkBlocklist = defaultDeeplinkBlocklist.map(stringWhitelistToRegex)
+      const foundMatchInBlocklist = matchWithRegexList(_deeplinkBlocklist, url)
 
-      if (allowedToOpenDeepLink) {
+      const _deeplinkWhitelist = (deepLinkWhitelist || []).map(stringWhitelistToRegex)
+      const foundMatchInAllowlist = matchWithRegexList(_deeplinkWhitelist, url)
+
+      if (!foundMatchInBlocklist && foundMatchInAllowlist) {
         Linking.canOpenURL(url).then((supported) => {
           if (supported && isTopFrame) {
             return Linking.openURL(url);
@@ -77,7 +81,7 @@ const createOnShouldStartLoadWithRequest = (
           console.warn('Error opening URL: ', e);
         });
       } else {
-        console.warn(`Failed to pass whitelist deep link url: ${url}`);
+        console.warn(`Failed to pass default block list or whitelist deep link url: ${url}`);
       }
 
       shouldStart = false;
