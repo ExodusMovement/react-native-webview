@@ -888,7 +888,7 @@ export interface WebViewSharedProps extends ViewProps {
   /**
    * List of regex strings to allow being deep linked to. The strings allow
    * wildcards and get matched against the full URL.
-   * The default behavior is to not allow any.
+   * The default behavior is to only allow "https://*".
    */
     readonly deeplinkWhitelist?: string[];
 
