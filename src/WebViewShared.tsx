@@ -24,18 +24,18 @@ const extractOrigin = (url: string): string => {
   return result === null ? '' : result[0];
 };
 
-const stringWhitelistToRegex = (originWhitelist: string): string =>
-  `^${escapeStringRegexp(originWhitelist).replace(/\\\*/g, '.*')}$`;
+const stringWhitelistToRegex = (originWhitelist: string): RegExp =>
+  new RegExp(`^${escapeStringRegexp(originWhitelist).replace(/\\\*/g, '.*')}$`);
 
 const matchWithRegexList = (
-  compiledWhitelist: readonly string[] | readonly RegExp[],
+  compiledRegexList: readonly RegExp[],
   value: string,
 ) => {
-  return compiledWhitelist.some(x => new RegExp(x).test(value));
+  return compiledRegexList.some(x => x.test(value));
 };
 
 const _passesWhitelist = (
-  compiledWhitelist: readonly string[],
+  compiledWhitelist: readonly RegExp[],
   url: string,
 ) => {
   const origin = extractOrigin(url);
@@ -46,7 +46,7 @@ const _passesWhitelist = (
 
 const compileWhitelist = (
   originWhitelist: readonly string[],
-): readonly string[] =>
+): readonly RegExp[] =>
   ['about:blank', ...(originWhitelist || [])].map(stringWhitelistToRegex);
 
 const createOnShouldStartLoadWithRequest = (
