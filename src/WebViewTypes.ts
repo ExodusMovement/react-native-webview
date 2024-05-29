@@ -886,9 +886,9 @@ export interface WebViewSharedProps extends ViewProps {
   readonly originWhitelist?: string[];
 
   /**
-   * List of regex strings to allow being deep linked to. The strings allow
-   * wildcards and get matched against the full URL.
-   * The default behavior is to only allow "https://*".
+   * List of prefixes to allow being deep linked to. The strings do NOT allow
+   * wildcards and get matched against the full URL using "startsWith".
+   * The default behavior is to only allow "https://".
    */
     readonly deeplinkWhitelist?: string[];
 
