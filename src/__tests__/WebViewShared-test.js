@@ -70,7 +70,7 @@ describe('WebViewShared', () => {
       const onShouldStartLoadWithRequest = createOnShouldStartLoadWithRequest(
         loadRequest,
         defaultOriginWhitelist,
-        ['invalid://*'],
+        ['invalid://'],
       );
 
       onShouldStartLoadWithRequest({ nativeEvent: { url: 'invalid://example.com/', isTopFrame: true, lockIdentifier: 2 } });
@@ -101,7 +101,7 @@ describe('WebViewShared', () => {
       const onShouldStartLoadWithRequest = createOnShouldStartLoadWithRequest(
         loadRequest,
         defaultOriginWhitelist,
-        ['invalid://*'],
+        ['invalid://'],
         alwaysTrueOnShouldStartLoadWithRequest,
       );
 
@@ -119,7 +119,7 @@ describe('WebViewShared', () => {
       const onShouldStartLoadWithRequest = createOnShouldStartLoadWithRequest(
         loadRequest,
         ['https://*'],
-        ['bitcoin:*'],
+        ['bitcoin:'],
       );
 
       const good = 'bitcoin:175tWpb8K1S7NmH4Zx6rewF9WQrcZv245W?amount=50&label=Luke-Jr&message=Donation%20for%20project%20xyz'
@@ -141,7 +141,7 @@ describe('WebViewShared', () => {
       const onShouldStartLoadWithRequest = createOnShouldStartLoadWithRequest(
         loadRequest,
         ['https://*'],
-        ['bitcoin:*'],
+        ['bitcoin:'],
       );
 
       onShouldStartLoadWithRequest({ nativeEvent: { url: bad, isTopFrame: true, lockIdentifier: 1 } });
@@ -155,7 +155,7 @@ describe('WebViewShared', () => {
       const onShouldStartLoadWithRequest = createOnShouldStartLoadWithRequest(
         loadRequest,
         [],
-        ['javascript:*'],
+        ['javascript:'],
       );
       const bad = 'javascript:alert(1)'
       onShouldStartLoadWithRequest({ nativeEvent: { url: bad, isTopFrame: true, lockIdentifier: 1 } });
@@ -185,7 +185,7 @@ describe('WebViewShared', () => {
       const onShouldStartLoadWithRequest = createOnShouldStartLoadWithRequest(
         loadRequest,
         ['https://*'],
-        ['git+https:*', 'fakehttps:*'],
+        ['git+https:', 'fakehttps:'],
       );
 
       onShouldStartLoadWithRequest({ nativeEvent: { url: 'https://www.example.com/', isTopFrame: true, lockIdentifier: 1 } });
@@ -221,7 +221,7 @@ describe('WebViewShared', () => {
       const onShouldStartLoadWithRequest = createOnShouldStartLoadWithRequest(
           loadRequest,
           ['plus+https://*', 'DOT.https://*', 'dash-https://*', '0invalid://*', '+invalid://*'],
-          ['0invalid:*', '+invalid:*', 'FAKE+plus+https:*'],
+          ['0invalid:', '+invalid:', 'FAKE+plus+https:'],
       );
 
       onShouldStartLoadWithRequest({ nativeEvent: { url: 'plus+https://www.example.com/',  isTopFrame: true, lockIdentifier: 1 } });

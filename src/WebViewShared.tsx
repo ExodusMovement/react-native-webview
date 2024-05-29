@@ -16,7 +16,7 @@ import {
 import styles from './WebView.styles';
 
 const defaultOriginWhitelist = ['https://*'] as const;
-const defaultDeeplinkWhitelist = ['https://*'] as const;
+const defaultDeeplinkWhitelist = ['https://'] as const;
 const defaultDeeplinkBlocklist = [/^http:/i, /^file:/i, /^javascript:/i] as const;
 
 const extractOrigin = (url: string): string => {
@@ -32,6 +32,14 @@ const matchWithRegexList = (
   value: string,
 ) => {
   return compiledRegexList.some(x => x.test(value));
+};
+
+const matchWithPrefixStringList = (
+  prefixes: readonly string[],
+  value: string,
+) => {
+  if (typeof value !== 'string') throw new Error(`value was not a string`)
+  return prefixes.some(x => value.startsWith(x));
 };
 
 const _passesWhitelist = (
@@ -71,8 +79,7 @@ const createOnShouldStartLoadWithRequest = (
       const foundMatchInBlocklist = matchWithRegexList(defaultDeeplinkBlocklist, url)
       if (!foundMatchInBlocklist) {
         /** Check if the url passes the dynamic deeplink allow list */
-        const _deeplinkWhitelist = (deepLinkWhitelist || []).map(stringWhitelistToRegex)
-        const foundMatchInAllowlist = matchWithRegexList(_deeplinkWhitelist, url)
+        const foundMatchInAllowlist = matchWithPrefixStringList(deepLinkWhitelist, url)
   
         if (foundMatchInAllowlist) {
           Linking.canOpenURL(url).then((supported) => {
