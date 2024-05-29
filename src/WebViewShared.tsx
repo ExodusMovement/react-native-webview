@@ -49,7 +49,7 @@ const _passesWhitelist = (
   const origin = extractOrigin(url);
   if (!origin) return false;
   if (origin !== new URL(url).origin) return null;
-  return matchWithRegexList(compiledWhitelist,  origin)
+  return matchWithRegexList(compiledWhitelist, origin)
 };
 
 const compileWhitelist = (
