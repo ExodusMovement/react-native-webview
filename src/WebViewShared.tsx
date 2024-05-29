@@ -59,28 +59,34 @@ const createOnShouldStartLoadWithRequest = (
   deepLinkWhitelist: readonly string[],
   onShouldStartLoadWithRequest?: OnShouldStartLoadWithRequest,
 ) => {
+  const compiledWhiteList = compileWhitelist(originWhitelist)
+
   return ({ nativeEvent }: ShouldStartLoadRequestEvent) => {
     let shouldStart = true;
     const { url, lockIdentifier, isTopFrame } = nativeEvent;
 
-    if (!_passesWhitelist(compileWhitelist(originWhitelist), url)) {
+    /** Check if the url passes the origin whitelist */
+    if (!_passesWhitelist(compiledWhiteList, url)) {
+      /** Check if the url passes the hardcoded deeplink blocklist */
       const foundMatchInBlocklist = matchWithRegexList(defaultDeeplinkBlocklist, url)
-
-      const _deeplinkWhitelist = (deepLinkWhitelist || []).map(stringWhitelistToRegex)
-      const foundMatchInAllowlist = matchWithRegexList(_deeplinkWhitelist, url)
-
-      if (!foundMatchInBlocklist && foundMatchInAllowlist) {
-        Linking.canOpenURL(url).then((supported) => {
-          if (supported && isTopFrame) {
-            return Linking.openURL(url);
-          }
-          console.warn(`Can't open url: ${url}`);
-          return undefined;
-        }).catch(e => {
-          console.warn('Error opening URL: ', e);
-        });
-      } else {
-        console.warn(`Failed to pass default block list or whitelist deep link url: ${url}`);
+      if (!foundMatchInBlocklist) {
+        /** Check if the url passes the dynamic deeplink allow list */
+        const _deeplinkWhitelist = (deepLinkWhitelist || []).map(stringWhitelistToRegex)
+        const foundMatchInAllowlist = matchWithRegexList(_deeplinkWhitelist, url)
+  
+        if (foundMatchInAllowlist) {
+          Linking.canOpenURL(url).then((supported) => {
+            if (supported && isTopFrame) {
+              return Linking.openURL(url);
+            }
+            console.warn(`Can't open url: ${url}`);
+            return undefined;
+          }).catch(e => {
+            console.warn('Error opening URL: ', e);
+          });
+        } else {
+          console.warn(`Failed to pass default block list or whitelist deep link url: ${url}`);
+        }
       }
 
       shouldStart = false;
