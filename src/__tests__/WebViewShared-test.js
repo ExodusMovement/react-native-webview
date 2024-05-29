@@ -151,6 +151,24 @@ describe('WebViewShared', () => {
       expect(Linking.openURL).not.toHaveBeenCalledWith(bad)
     });
 
+    test.each([
+      '',
+      [''],
+      '*'
+    ])('Linking.openURL with empty allow list should not allow passing', async (badList) => {
+      const onShouldStartLoadWithRequest = createOnShouldStartLoadWithRequest(
+        loadRequest,
+        [],
+        [badList],
+      );
+      const bad = 'bitcoin:'
+      onShouldStartLoadWithRequest({ nativeEvent: { url: bad, isTopFrame: true, lockIdentifier: 1 } });
+      
+      await flushPromises();
+
+      expect(Linking.openURL).not.toHaveBeenCalledWith(bad)
+    });
+
     test('Linking.openURL with hardcoded blocklist should take priority over whitelist', async () => {
       const onShouldStartLoadWithRequest = createOnShouldStartLoadWithRequest(
         loadRequest,
