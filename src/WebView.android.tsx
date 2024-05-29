@@ -15,6 +15,7 @@ import invariant from 'invariant';
 import RNCWebView from "./WebViewNativeComponent.android";
 import {
   defaultOriginWhitelist,
+  defaultDeeplinkWhitelist,
   defaultRenderError,
   defaultRenderLoading,
   useWebWiewLogic,
@@ -67,6 +68,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
   androidHardwareAccelerationDisabled = false,
   androidLayerType = "none",
   originWhitelist = defaultOriginWhitelist,
+  deeplinkWhitelist = defaultDeeplinkWhitelist,
   setBuiltInZoomControls = true,
   setDisplayZoomControls = false,
   nestedScrollEnabled = false,
@@ -111,6 +113,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
     onOpenWindowProp,
     startInLoadingState,
     originWhitelist,
+    deeplinkWhitelist,
     onShouldStartLoadWithRequestProp,
     onShouldStartLoadWithRequestCallback,
     validateMeta,

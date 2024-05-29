@@ -16,29 +16,46 @@ import {
 import styles from './WebView.styles';
 
 const defaultOriginWhitelist = ['https://*'] as const;
+const defaultDeeplinkWhitelist = ['https://'] as const;
+const defaultDeeplinkBlocklist = [/^http:/i, /^file:/i, /^javascript:/i] as const;
 
 const extractOrigin = (url: string): string => {
   const result = /^[A-Za-z][A-Za-z0-9+\-.]+:(\/\/)?[^/]*/.exec(url);
   return result === null ? '' : result[0];
 };
 
-const originWhitelistToRegex = (originWhitelist: string): string =>
-  `^${escapeStringRegexp(originWhitelist).replace(/\\\*/g, '.*')}$`;
+const stringWhitelistToRegex = (originWhitelist: string): RegExp =>
+  new RegExp(`^${escapeStringRegexp(originWhitelist).replace(/\\\*/g, '.*')}$`);
+
+const matchWithRegexList = (
+  compiledRegexList: readonly RegExp[],
+  value: string,
+) => {
+  return compiledRegexList.some(x => x.test(value));
+};
+
+const matchWithPrefixStringList = (
+  prefixes: readonly string[],
+  value: string,
+) => {
+  if (typeof value !== 'string') throw new Error(`value was not a string`)
+  return prefixes.some(x => String(x).length && String.prototype.startsWith.call(value, x));
+};
 
 const _passesWhitelist = (
-  compiledWhitelist: readonly string[],
+  compiledWhitelist: readonly RegExp[],
   url: string,
 ) => {
   const origin = extractOrigin(url);
   if (!origin) return false;
   if (origin !== new URL(url).origin) return null;
-  return compiledWhitelist.some(x => new RegExp(x).test(origin));
+  return matchWithRegexList(compiledWhitelist, origin)
 };
 
 const compileWhitelist = (
   originWhitelist: readonly string[],
-): readonly string[] =>
-  ['about:blank', ...(originWhitelist || [])].map(originWhitelistToRegex);
+): readonly RegExp[] =>
+  ['about:blank', ...(originWhitelist || [])].map(stringWhitelistToRegex);
 
 const createOnShouldStartLoadWithRequest = (
   loadRequest: (
@@ -47,22 +64,38 @@ const createOnShouldStartLoadWithRequest = (
     lockIdentifier: number,
   ) => void,
   originWhitelist: readonly string[],
+  deepLinkWhitelist: readonly string[],
   onShouldStartLoadWithRequest?: OnShouldStartLoadWithRequest,
 ) => {
+  const compiledWhiteList = compileWhitelist(originWhitelist)
+
   return ({ nativeEvent }: ShouldStartLoadRequestEvent) => {
     let shouldStart = true;
     const { url, lockIdentifier, isTopFrame } = nativeEvent;
 
-    if (!_passesWhitelist(compileWhitelist(originWhitelist), url)) {
-      Linking.canOpenURL(url).then((supported) => {
-        if (supported && isTopFrame && /^https:\/\//.test(url)) {
-          return Linking.openURL(url);
+    /** Check if the url passes the origin whitelist */
+    if (!_passesWhitelist(compiledWhiteList, url)) {
+      /** Check if the url passes the hardcoded deeplink blocklist */
+      const foundMatchInBlocklist = matchWithRegexList(defaultDeeplinkBlocklist, url)
+      if (!foundMatchInBlocklist) {
+        /** Check if the url passes the dynamic deeplink allow list */
+        const foundMatchInAllowlist = matchWithPrefixStringList(deepLinkWhitelist, url)
+  
+        if (foundMatchInAllowlist) {
+          Linking.canOpenURL(url).then((supported) => {
+            if (supported && isTopFrame) {
+              return Linking.openURL(url);
+            }
+            console.warn(`Can't open url: ${url}`);
+            return undefined;
+          }).catch(e => {
+            console.warn('Error opening URL: ', e);
+          });
+        } else {
+          console.warn(`Failed to pass default block list or whitelist deep link url: ${url}`);
         }
-        console.warn(`Can't open url: ${url}`);
-        return undefined;
-      }).catch(e => {
-        console.warn('Error opening URL: ', e);
-      });
+      }
+
       shouldStart = false;
     } else if (onShouldStartLoadWithRequest) {
       shouldStart = onShouldStartLoadWithRequest(nativeEvent);
@@ -92,6 +125,7 @@ const defaultRenderError = (
 
 export {
   defaultOriginWhitelist,
+  defaultDeeplinkWhitelist,
   createOnShouldStartLoadWithRequest,
   defaultRenderLoading,
   defaultRenderError,
@@ -107,6 +141,7 @@ export const useWebWiewLogic = ({
   onMessageProp,
   onOpenWindowProp,
   originWhitelist,
+  deeplinkWhitelist,
   onShouldStartLoadWithRequestProp,
   onShouldStartLoadWithRequestCallback,
   validateMeta,
@@ -120,6 +155,7 @@ export const useWebWiewLogic = ({
   onMessageProp?: (event: WebViewMessage) => void;
   onOpenWindowProp?: (event: WebViewOpenWindowEvent) => void;
   originWhitelist: readonly string[];
+  deeplinkWhitelist: readonly string[];
   onShouldStartLoadWithRequestProp?: OnShouldStartLoadWithRequest;
   onShouldStartLoadWithRequestCallback: (shouldStart: boolean, url: string, lockIdentifier?: number | undefined) => void;
   validateMeta: (event: WebViewNativeEvent) => WebViewNativeEvent;
@@ -208,9 +244,10 @@ export const useWebWiewLogic = ({
   const onShouldStartLoadWithRequest = useMemo(() =>  createOnShouldStartLoadWithRequest(
       onShouldStartLoadWithRequestCallback,
       originWhitelist,
+      deeplinkWhitelist,
       onShouldStartLoadWithRequestProp,
     )
-  , [originWhitelist, onShouldStartLoadWithRequestProp, onShouldStartLoadWithRequestCallback])
+  , [originWhitelist, deeplinkWhitelist, onShouldStartLoadWithRequestProp, onShouldStartLoadWithRequestCallback])
 
   // Android Only
   const onOpenWindow = useCallback((event: WebViewOpenWindowEvent) => {
