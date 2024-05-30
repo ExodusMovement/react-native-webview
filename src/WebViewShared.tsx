@@ -48,7 +48,12 @@ const _passesWhitelist = (
 ) => {
   const origin = extractOrigin(url);
   if (!origin) return false;
-  if (origin !== new URL(url).origin) return null;
+  try {
+    const decodedUrl = new URL(url)
+    if (origin !== decodedUrl.origin) return null;
+  } catch {
+    return false
+  }
   return matchWithRegexList(compiledWhitelist, origin)
 };
 
