@@ -39,7 +39,7 @@ const matchWithPrefixStringList = (
   value: string,
 ) => {
   if (typeof value !== 'string') throw new Error(`value was not a string`)
-  return prefixes.some(x => String(x).length && String.prototype.startsWith.call(value, x));
+  return Array.prototype.includes.call(prefixes, value)
 };
 
 const _passesWhitelist = (
