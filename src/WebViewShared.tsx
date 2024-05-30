@@ -16,8 +16,8 @@ import {
 import styles from './WebView.styles';
 
 const defaultOriginWhitelist = ['https://*'] as const;
-const defaultDeeplinkWhitelist = ['https://'] as const;
-const defaultDeeplinkBlocklist = [/^http:/i, /^file:/i, /^javascript:/i] as const;
+const defaultDeeplinkWhitelist = ['https:'] as const;
+const defaultDeeplinkBlocklist = [`http:`, `file:`, `javascript:`] as const;
 
 const extractOrigin = (url: string): string => {
   const result = /^[A-Za-z][A-Za-z0-9+\-.]+:(\/\/)?[^/]*/.exec(url);
@@ -34,12 +34,12 @@ const matchWithRegexList = (
   return compiledRegexList.some(x => x.test(value));
 };
 
-const matchWithPrefixStringList = (
+const matchWithStringList = (
   prefixes: readonly string[],
   value: string,
 ) => {
   if (typeof value !== 'string') throw new Error(`value was not a string`)
-  return prefixes.some(x => String(x).length && String.prototype.startsWith.call(value, x));
+  return Array.prototype.includes.call(prefixes, value)
 };
 
 const _passesWhitelist = (
@@ -48,7 +48,12 @@ const _passesWhitelist = (
 ) => {
   const origin = extractOrigin(url);
   if (!origin) return false;
-  if (origin !== new URL(url).origin) return null;
+  try {
+    const decodedUrl = new URL(url)
+    if (origin !== decodedUrl.origin) return null;
+  } catch {
+    return false
+  }
   return matchWithRegexList(compiledWhitelist, origin)
 };
 
@@ -56,6 +61,16 @@ const compileWhitelist = (
   originWhitelist: readonly string[],
 ): readonly RegExp[] =>
   ['about:blank', ...(originWhitelist || [])].map(stringWhitelistToRegex);
+
+const urlToProtocolScheme = (url: string): string | null => {
+  try {
+    return new URL(url).protocol
+  } catch {
+    // Protocol schemes must start with a letter and cannot start with digits, underscores etc.
+    // e.g 0invalid, _invalid, +invalid,  -invalid, .invalid will all become null
+    return null
+  }
+}
 
 const createOnShouldStartLoadWithRequest = (
   loadRequest: (
@@ -75,24 +90,31 @@ const createOnShouldStartLoadWithRequest = (
 
     /** Check if the url passes the origin whitelist */
     if (!_passesWhitelist(compiledWhiteList, url)) {
-      /** Check if the url passes the hardcoded deeplink blocklist */
-      const foundMatchInBlocklist = matchWithRegexList(defaultDeeplinkBlocklist, url)
-      if (!foundMatchInBlocklist) {
-        /** Check if the url passes the dynamic deeplink allow list */
-        const foundMatchInAllowlist = matchWithPrefixStringList(deepLinkWhitelist, url)
-  
-        if (foundMatchInAllowlist) {
-          Linking.canOpenURL(url).then((supported) => {
-            if (supported && isTopFrame) {
-              return Linking.openURL(url);
-            }
-            console.warn(`Can't open url: ${url}`);
-            return undefined;
-          }).catch(e => {
-            console.warn('Error opening URL: ', e);
-          });
+      const protocol = urlToProtocolScheme(url)
+      
+      /* Check that the protocol was properly parsed */
+      if (protocol !== null) {
+        /** Check if the protocol passes the hardcoded deeplink blocklist */
+        const foundMatchInBlocklist = matchWithStringList(defaultDeeplinkBlocklist, protocol)
+        if (!foundMatchInBlocklist) {
+          /** Check if the protocol passes the dynamic deeplink allow list */
+          const foundMatchInAllowlist = matchWithStringList(deepLinkWhitelist, protocol)
+    
+          if (foundMatchInAllowlist) {
+            Linking.canOpenURL(url).then((supported) => {
+              if (supported && isTopFrame) {
+                return Linking.openURL(url);
+              }
+              console.warn(`Can't open url: ${url}`);
+              return undefined;
+            }).catch(e => {
+              console.warn('Error opening URL: ', e);
+            });
+          } else {
+            console.warn(`Failed to pass whitelist for deep link url: ${url}`);
+          }
         } else {
-          console.warn(`Failed to pass default block list or whitelist deep link url: ${url}`);
+          console.warn(`Failed to pass default block list for deep link url: ${url}`);
         }
       }
 

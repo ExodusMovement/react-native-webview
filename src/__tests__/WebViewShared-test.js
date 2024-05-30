@@ -70,7 +70,7 @@ describe('WebViewShared', () => {
       const onShouldStartLoadWithRequest = createOnShouldStartLoadWithRequest(
         loadRequest,
         defaultOriginWhitelist,
-        ['invalid://'],
+        ['invalid:'],
       );
 
       onShouldStartLoadWithRequest({ nativeEvent: { url: 'invalid://example.com/', isTopFrame: true, lockIdentifier: 2 } });
@@ -101,7 +101,7 @@ describe('WebViewShared', () => {
       const onShouldStartLoadWithRequest = createOnShouldStartLoadWithRequest(
         loadRequest,
         defaultOriginWhitelist,
-        ['invalid://'],
+        ['invalid:'],
         alwaysTrueOnShouldStartLoadWithRequest,
       );
 
@@ -239,7 +239,7 @@ describe('WebViewShared', () => {
       const onShouldStartLoadWithRequest = createOnShouldStartLoadWithRequest(
           loadRequest,
           ['plus+https://*', 'DOT.https://*', 'dash-https://*', '0invalid://*', '+invalid://*'],
-          ['0invalid:', '+invalid:', 'FAKE+plus+https:'],
+          ['0invalid:', '+invalid:', 'fake+plus+https:'],
       );
 
       onShouldStartLoadWithRequest({ nativeEvent: { url: 'plus+https://www.example.com/',  isTopFrame: true, lockIdentifier: 1 } });
@@ -270,7 +270,7 @@ describe('WebViewShared', () => {
 
       await flushPromises();
 
-      expect(Linking.openURL).toHaveBeenLastCalledWith('0invalid://www.example.com/');
+      expect(Linking.openURL).not.toHaveBeenLastCalledWith('0invalid://www.example.com/');
       // (new URL('DOT.https://www.example.com/')).origin is null so it doesn't pass _passesWhitelist
       expect(loadRequest).toHaveBeenLastCalledWith(false, '0invalid://www.example.com/', 4);
 
@@ -278,7 +278,7 @@ describe('WebViewShared', () => {
       
       await flushPromises();
 
-      expect(Linking.openURL).toHaveBeenLastCalledWith('+invalid://www.example.com/');
+      expect(Linking.openURL).not.toHaveBeenLastCalledWith('+invalid://www.example.com/');
       expect(loadRequest).toHaveBeenLastCalledWith(false, '+invalid://www.example.com/', 5);
 
       onShouldStartLoadWithRequest({ nativeEvent: { url: 'FAKE+plus+https://www.example.com/',  isTopFrame: true, lockIdentifier: 6 } });
