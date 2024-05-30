@@ -34,7 +34,7 @@ const matchWithRegexList = (
   return compiledRegexList.some(x => x.test(value));
 };
 
-const matchWithPrefixStringList = (
+const matchWithStringList = (
   prefixes: readonly string[],
   value: string,
 ) => {
@@ -90,10 +90,10 @@ const createOnShouldStartLoadWithRequest = (
       /* Check that the protocol was properly parsed */
       if (protocol !== null) {
         /** Check if the protocol passes the hardcoded deeplink blocklist */
-        const foundMatchInBlocklist = matchWithPrefixStringList(defaultDeeplinkBlocklist, protocol)
+        const foundMatchInBlocklist = matchWithStringList(defaultDeeplinkBlocklist, protocol)
         if (!foundMatchInBlocklist) {
           /** Check if the protocol passes the dynamic deeplink allow list */
-          const foundMatchInAllowlist = matchWithPrefixStringList(deepLinkWhitelist, protocol)
+          const foundMatchInAllowlist = matchWithStringList(deepLinkWhitelist, protocol)
     
           if (foundMatchInAllowlist) {
             Linking.canOpenURL(url).then((supported) => {
@@ -106,8 +106,10 @@ const createOnShouldStartLoadWithRequest = (
               console.warn('Error opening URL: ', e);
             });
           } else {
-            console.warn(`Failed to pass default block list or whitelist deep link url: ${url}`);
+            console.warn(`Failed to pass whitelist for deep link url: ${url}`);
           }
+        } else {
+          console.warn(`Failed to pass default block list for deep link url: ${url}`);
         }
       }
 
