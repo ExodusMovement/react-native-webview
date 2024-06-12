@@ -41,9 +41,13 @@ const _passesWhitelist = (
   compiledWhitelist: readonly RegExp[],
   url: string,
 ) => {
-  const { origin } = new URL(url);
-  if (!origin) return false;
-  return matchWithRegexList(compiledWhitelist, origin)
+  try {
+    const { origin } = new URL(url)
+    if (!origin) return null;
+    return matchWithRegexList(compiledWhitelist, origin)
+  } catch {
+    return false
+  }
 };
 
 const compileWhitelist = (
