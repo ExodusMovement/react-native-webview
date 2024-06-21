@@ -1062,9 +1062,14 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       for (String requestedResource : request.getResources()) {
         String androidPermission = null;
 
-        if (requestedResource.equals(PermissionRequest.RESOURCE_VIDEO_CAPTURE)
-            && cameraPermissionOriginWhitelist.contains(request.getOrigin().toString())) {
-          androidPermission = Manifest.permission.CAMERA;
+        if (cameraPermissionOriginWhitelist.contains(request.getOrigin().toString())) {
+          if (requestedResource.equals(PermissionRequest.RESOURCE_VIDEO_CAPTURE)) {
+            androidPermission = Manifest.permission.CAMERA;
+          } else if (requestedResource.equals(PermissionRequest.RESOURCE_AUDIO_CAPTURE)) {
+            androidPermission = Manifest.permission.RECORD_AUDIO;
+          } else {
+            continue;
+          }
         } else {
           continue;
         }
@@ -1107,6 +1112,8 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
                 if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
                   if (permissions[i].equals(Manifest.permission.CAMERA)) {
                     grantedPermissions.add(PermissionRequest.RESOURCE_VIDEO_CAPTURE);
+                  } else if (permissions[i].equals(Manifest.permission.RECORD_AUDIO)) {
+                    grantedPermissions.add(PermissionRequest.RESOURCE_AUDIO_CAPTURE);
                   }
                 }
               }
