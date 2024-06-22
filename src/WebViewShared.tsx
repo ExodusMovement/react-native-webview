@@ -19,11 +19,6 @@ const defaultOriginWhitelist = ['https://*'] as const;
 const defaultDeeplinkWhitelist = ['https:'] as const;
 const defaultDeeplinkBlocklist = [`http:`, `file:`, `javascript:`] as const;
 
-const extractOrigin = (url: string): string => {
-  const result = /^[A-Za-z][A-Za-z0-9+\-.]+:(\/\/)?[^/]*/.exec(url);
-  return result === null ? '' : result[0];
-};
-
 const stringWhitelistToRegex = (originWhitelist: string): RegExp =>
   new RegExp(`^${escapeStringRegexp(originWhitelist).replace(/\\\*/g, '.*')}$`);
 
@@ -46,15 +41,13 @@ const _passesWhitelist = (
   compiledWhitelist: readonly RegExp[],
   url: string,
 ) => {
-  const origin = extractOrigin(url);
-  if (!origin) return false;
   try {
-    const decodedUrl = new URL(url)
-    if (origin !== decodedUrl.origin) return null;
+    const { origin } = new URL(url)
+    if (!origin) return null;
+    return matchWithRegexList(compiledWhitelist, origin)
   } catch {
     return false
   }
-  return matchWithRegexList(compiledWhitelist, origin)
 };
 
 const compileWhitelist = (
