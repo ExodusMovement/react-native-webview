@@ -43,8 +43,7 @@ const _passesWhitelist = (
 ) => {
   try {
     const { origin } = new URL(url)
-    if (!origin) return null;
-    return matchWithRegexList(compiledWhitelist, origin)
+    return origin && matchWithRegexList(compiledWhitelist, origin)
   } catch {
     return false
   }
