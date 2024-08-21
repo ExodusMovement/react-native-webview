@@ -171,6 +171,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   public RNCWebViewManager() {
     cameraPermissionOriginWhitelist = new HashSet<>();
     cameraPermissionOriginWhitelist.add("https://alchemy.veriff.com/");
+    cameraPermissionOriginWhitelist.add("https://magic.veriff.me/");
 
     mWebViewConfig = new WebViewConfig() {
       public void configWebView(WebView webView) {
