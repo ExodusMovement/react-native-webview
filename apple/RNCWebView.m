@@ -580,6 +580,14 @@ RCTAutoInsetsProtocol>
   }
 }
 #endif
+
+- (NSMutableDictionary<NSString *, id> *)baseEventWithScriptMessage:(WKScriptMessage *)message {
+    NSMutableDictionary<NSString *, id> *event = [self baseEvent];
+    NSString *messageOriginURL = message.frameInfo.request.URL.absoluteString ?: @"";
+    event[@"url"] = messageOriginURL;
+    return event;
+}
+
 /**
  * This method is called whenever JavaScript running within the web view calls:
  *   - window.webkit.messageHandlers[MessageHandlerName].postMessage
@@ -589,13 +597,13 @@ RCTAutoInsetsProtocol>
 {
   if ([message.name isEqualToString:HistoryShimName]) {
     if (_onLoadingFinish) {
-      NSMutableDictionary<NSString *, id> *event = [self baseEvent];
+      NSMutableDictionary<NSString *, id> *event = [self baseEventWithScriptMessage:message];
       [event addEntriesFromDictionary: @{@"navigationType": message.body}];
       _onLoadingFinish(event);
     }
   } else if ([message.name isEqualToString:MessageHandlerName]) {
     if (_onMessage) {
-      NSMutableDictionary<NSString *, id> *event = [self baseEvent];
+      NSMutableDictionary<NSString *, id> *event = [self baseEventWithScriptMessage:message];
       [event addEntriesFromDictionary: @{@"data": message.body}];
       _onMessage(event);
     }
