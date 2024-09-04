@@ -841,6 +841,11 @@ export interface WebViewSharedProps extends ViewProps {
   onMessage?: (event: WebViewMessage) => void;
 
   /**
+   * Function that is invoked when the `WebView` is loading.
+   */
+  onLoadProgress?: (event: WebViewProgressEvent) => void;
+
+  /**
    * Boolean value that forces the `WebView` to show the loading view
    * on the first load.
    */

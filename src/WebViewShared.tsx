@@ -150,6 +150,7 @@ export const useWebWiewLogic = ({
   startInLoadingState,
   onLoadStart,
   onLoad,
+  onLoadProgress,
   onLoadEnd,
   onError,
   onMessageProp,
@@ -164,6 +165,7 @@ export const useWebWiewLogic = ({
   startInLoadingState?: boolean
   onLoadStart?: (event: WebViewNavigationEvent) => void;
   onLoad?: (event: WebViewNavigationEvent) => void;
+  onLoadProgress?: (event: WebViewProgressEvent) => void;
   onLoadEnd?: (event: WebViewNavigationEvent | WebViewErrorEvent) => void;
   onError?: (event: WebViewErrorEvent) => void;
   onMessageProp?: (event: WebViewMessage) => void;
@@ -252,8 +254,8 @@ export const useWebWiewLogic = ({
       setViewState(prevViewState => prevViewState === 'LOADING' ? 'IDLE' : prevViewState);
     }
     // !patch for Android only
-    // REMOVED: onLoadProgress?.(event);
-  }, [passesWhitelistUse]);
+    onLoadProgress?.(event);
+  }, [onLoadProgress, passesWhitelistUse]);
 
   const onShouldStartLoadWithRequest = useMemo(() =>  createOnShouldStartLoadWithRequest(
       onShouldStartLoadWithRequestCallback,
