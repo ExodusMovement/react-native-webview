@@ -582,8 +582,13 @@ RCTAutoInsetsProtocol>
 #endif
 
 - (NSMutableDictionary<NSString *, id> *)baseEventWithScriptMessage:(WKScriptMessage *)message {
+    WKSecurityOrigin *securityOrigin = message.frameInfo.securityOrigin;
+    NSString *protocol = securityOrigin.protocol;
+    NSString *host = securityOrigin.host;
+
+    NSString *messageOriginURL = [NSString stringWithFormat:@"%@://%@", protocol, host];
+    
     NSMutableDictionary<NSString *, id> *event = [self baseEvent];
-    NSString *messageOriginURL = message.frameInfo.request.URL.absoluteString ?: @"";
     event[@"url"] = messageOriginURL;
     return event;
 }
