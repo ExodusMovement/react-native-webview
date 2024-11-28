@@ -1,5 +1,5 @@
 import invariant from 'invariant'
-import { AndroidWebViewProps, IOSWebViewProps } from './WebViewTypes'
+import type { AndroidWebViewProps, IOSWebViewProps } from './WebViewTypes'
 
 const validateProps = <P extends IOSWebViewProps | AndroidWebViewProps>(props: P): P => {
   if(props.source && 'html' in props.source){
