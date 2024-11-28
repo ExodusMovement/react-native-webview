@@ -27,6 +27,7 @@ import {
 } from './WebViewTypes';
 
 import styles from './WebView.styles';
+import validateProps from './validation'
 
 const { getWebViewDefaultUserAgent } = NativeModules.RNCWebViewUtils;
 
@@ -58,39 +59,41 @@ const setSupportMultipleWindows = true;
 const mixedContentMode = 'never'
 const hardMinimumChromeVersion = '100.0' // TODO: determinime a good lower bound
 
-const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
-  overScrollMode = 'always',
-  javaScriptEnabled = true,
-  thirdPartyCookiesEnabled = true,
-  scalesPageToFit = true,
-  saveFormDataDisabled = false,
-  cacheEnabled = true,
-  androidHardwareAccelerationDisabled = false,
-  androidLayerType = "none",
-  originWhitelist = defaultOriginWhitelist,
-  deeplinkWhitelist = defaultDeeplinkWhitelist,
-  setBuiltInZoomControls = true,
-  setDisplayZoomControls = false,
-  nestedScrollEnabled = false,
-  startInLoadingState,
-  onLoadStart,
-  onError,
-  onLoad,
-  onLoadEnd,
-  onMessage: onMessageProp,
-  onOpenWindow: onOpenWindowProp,
-  renderLoading,
-  renderError,
-  style,
-  containerStyle,
-  source,
-  onShouldStartLoadWithRequest: onShouldStartLoadWithRequestProp,
-  validateMeta,
-  validateData,
-  minimumChromeVersion,
-  unsupportedVersionComponent: UnsupportedVersionComponent,
-  ...otherProps
-}, ref) => {
+const WebViewComponent = forwardRef<{}, AndroidWebViewProps>((props, ref) => {
+  const {
+    overScrollMode = 'always',
+    javaScriptEnabled = true,
+    thirdPartyCookiesEnabled = true,
+    scalesPageToFit = true,
+    saveFormDataDisabled = false,
+    cacheEnabled = true,
+    androidHardwareAccelerationDisabled = false,
+    androidLayerType = "none",
+    originWhitelist = defaultOriginWhitelist,
+    deeplinkWhitelist = defaultDeeplinkWhitelist,
+    setBuiltInZoomControls = true,
+    setDisplayZoomControls = false,
+    nestedScrollEnabled = false,
+    startInLoadingState,
+    onLoadStart,
+    onError,
+    onLoad,
+    onLoadEnd,
+    onMessage: onMessageProp,
+    onOpenWindow: onOpenWindowProp,
+    renderLoading,
+    renderError,
+    style,
+    containerStyle,
+    source,
+    onShouldStartLoadWithRequest: onShouldStartLoadWithRequestProp,
+    validateMeta,
+    validateData,
+    minimumChromeVersion,
+    unsupportedVersionComponent: UnsupportedVersionComponent,
+    ...otherProps
+  } = validateProps(props)
+
   const messagingModuleName = useRef<string>(`WebViewMessageHandler${uniqueRef += 1}`).current;
   const webViewRef = useRef<NativeWebViewAndroid | null>(null);
 
@@ -197,10 +200,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
     }
   }
 
-  if (typeof source === "object" && 'uri' in source && !passesWhitelist(source.uri)){
-    // eslint-disable-next-line
-    source = {uri: "about:blank"};
-  }
+  const safeSource = (typeof source === "object" && 'uri' in source && !passesWhitelist(source.uri)) ? { uri: 'about:blank' } : source;
 
   const NativeWebView = RNCWebView;
 
@@ -220,7 +220,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(({
     
     ref={webViewRef}
     // TODO: find a better way to type this.
-    source={source}
+    source={safeSource}
     style={webViewStyles}
     overScrollMode={overScrollMode}
     javaScriptEnabled={javaScriptEnabled}
