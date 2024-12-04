@@ -26,6 +26,7 @@ import {
 } from './WebViewTypes';
 
 import styles from './WebView.styles';
+import validateProps from './validation'
 
 const codegenNativeCommands = codegenNativeCommandsUntyped as <T extends {}>(options: { supportedCommands: (keyof T)[] }) => T;
 
@@ -67,34 +68,36 @@ const enableApplePay = false;
 const dataDetectorTypes = 'none';
 const hardMinimumIOSVersion = '12.5.6 <13, 13.6.1 <14, 14.8.1 <15, 15.7.1'
 
-const WebViewComponent = forwardRef<{}, IOSWebViewProps>(({
-  javaScriptEnabled = true,
-  cacheEnabled = true,
-  originWhitelist = defaultOriginWhitelist,
-  deeplinkWhitelist = defaultDeeplinkWhitelist,
-  textInteractionEnabled= true,
-  injectedJavaScript,
-  injectedJavaScriptBeforeContentLoaded,
-  startInLoadingState,
-  onLoadStart,
-  onError,
-  onLoad,
-  onLoadEnd,
-  onMessage: onMessageProp,
-  renderLoading,
-  renderError,
-  style,
-  containerStyle,
-  source,
-  incognito,
-  validateMeta,
-  validateData,
-  decelerationRate: decelerationRateProp,
-  onShouldStartLoadWithRequest: onShouldStartLoadWithRequestProp,
-  minimumIOSVersion,
-  unsupportedVersionComponent: UnsupportedVersionComponent,
-  ...otherProps
-}, ref) => {
+const WebViewComponent = forwardRef<{}, IOSWebViewProps>((props, ref) => {
+  const {
+    javaScriptEnabled = true,
+    cacheEnabled = true,
+    originWhitelist = defaultOriginWhitelist,
+    deeplinkWhitelist = defaultDeeplinkWhitelist,
+    textInteractionEnabled= true,
+    injectedJavaScript,
+    injectedJavaScriptBeforeContentLoaded,
+    startInLoadingState,
+    onLoadStart,
+    onError,
+    onLoad,
+    onLoadEnd,
+    onMessage: onMessageProp,
+    renderLoading,
+    renderError,
+    style,
+    containerStyle,
+    source,
+    incognito,
+    validateMeta,
+    validateData,
+    decelerationRate: decelerationRateProp,
+    onShouldStartLoadWithRequest: onShouldStartLoadWithRequestProp,
+    minimumIOSVersion,
+    unsupportedVersionComponent: UnsupportedVersionComponent,
+    ...otherProps
+  } = validateProps(props)
+
   const webViewRef = useRef<NativeWebViewIOS | null>(null);
 
   const onShouldStartLoadWithRequestCallback = useCallback((
