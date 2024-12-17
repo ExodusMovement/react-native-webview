@@ -190,7 +190,7 @@ export const useWebWiewLogic = ({
   const extractMeta = (nativeEvent: WebViewNativeEvent): WebViewNativeEvent => ({
     url: String(nativeEvent.url),
     loading: Boolean(nativeEvent.loading),
-    title: String(nativeEvent.title),
+    title: String(nativeEvent.title).slice(0, 512),
     canGoBack: Boolean(nativeEvent.canGoBack),
     canGoForward: Boolean(nativeEvent.canGoForward),
     lockIdentifier: Number(nativeEvent.lockIdentifier),
