@@ -166,8 +166,6 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   protected @Nullable String mDownloadingMessage = null;
   protected @Nullable String mLackPermissionToDownloadMessage = null;
 
-  private Set<String> cameraPermissionWhitelist = new HashSet<>();
-
   public RNCWebViewManager() {
     mWebViewConfig = new WebViewConfig() {
       public void configWebView(WebView webView) {
@@ -235,7 +233,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       whitelistSet.add(whitelist.getString(i));
     }
 
-    webView.setCameraPermissionWhitelist(whitelistSet);
+    mWebChromeClient.setCameraPermissionWhitelist(whitelistSet);
   }
 
   @ReactProp(name = "javaScriptEnabled")
@@ -1004,10 +1002,15 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
     // True if protected media should be allowed, false otherwise
     protected boolean mAllowsProtectedMedia = false;
+    private Set<String> cameraPermissionWhitelist = new HashSet<>();
 
     public RNCWebChromeClient(ReactContext reactContext, WebView webView) {
       this.mReactContext = reactContext;
       this.mWebView = webView;
+    }
+
+    public void setCameraPermissionWhitelist(Set<String> whitelist) {
+      this.cameraPermissionWhitelist = whitelist;
     }
 
     @Override
@@ -1085,7 +1088,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       for (String requestedResource : request.getResources()) {
         String androidPermission = null;
 
-        if (cameraPermissionWhitelist.contains(originHost)) {
+        if (this.cameraPermissionWhitelist.contains(originHost)) {
           if (requestedResource.equals(PermissionRequest.RESOURCE_VIDEO_CAPTURE)) {
             androidPermission = Manifest.permission.CAMERA;
           } else if (requestedResource.equals(PermissionRequest.RESOURCE_AUDIO_CAPTURE)) {
