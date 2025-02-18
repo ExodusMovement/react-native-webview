@@ -71,6 +71,7 @@ RCTAutoInsetsProtocol>
 @property (nonatomic, strong) WKUserScript *postMessageScript;
 @property (nonatomic, strong) WKUserScript *atStartScript;
 @property (nonatomic, strong) WKUserScript *atEndScript;
+@property (nonatomic, strong) NSArray<NSString *> *cameraPermissionWhitelist;
 @end
 
 @implementation RNCWebView
@@ -97,15 +98,6 @@ RCTAutoInsetsProtocol>
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000 /* __IPHONE_13_0 */
   BOOL _savedAutomaticallyAdjustsScrollIndicatorInsets;
 #endif
-}
-
-+ (void)initialize {
-    if (self == [RNCWebView class]) {
-        cameraPermissionWhitelist = [NSSet setWithArray:@[
-            @"alchemy.veriff.com",
-            @"magic.veriff.me"
-        ]];
-    }
 }
 
 - (instancetype)initWithFrame:(CGRect)frame
@@ -1064,7 +1056,7 @@ RCTAutoInsetsProtocol>
                         initiatedByFrame:(WKFrameInfo *)frame
                                     type:(WKMediaCaptureType)type
                          decisionHandler:(void (^)(WKPermissionDecision decision))decisionHandler {
-  if (![cameraPermissionWhitelist containsObject:origin.host]) {
+  if (![self.cameraPermissionWhitelist containsObject:origin.host]) {
     decisionHandler(WKPermissionDecisionDeny);
     return;
   }
