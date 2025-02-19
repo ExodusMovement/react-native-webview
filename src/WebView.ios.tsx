@@ -17,6 +17,7 @@ import {
   defaultRenderLoading,
   useWebWiewLogic,
   versionPasses,
+  removeHttpsFromOrigins,
 } from './WebViewShared';
 import {
   IOSWebViewProps,
@@ -72,6 +73,7 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>((props, ref) => {
   const {
     javaScriptEnabled = true,
     cacheEnabled = true,
+    cameraPermissionWhitelist = [],
     originWhitelist = defaultOriginWhitelist,
     deeplinkWhitelist = defaultDeeplinkWhitelist,
     textInteractionEnabled= true,
@@ -190,6 +192,7 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>((props, ref) => {
       enableApplePay={enableApplePay}
       javaScriptEnabled={javaScriptEnabled}
       cacheEnabled={cacheEnabled}
+      cameraPermissionWhitelist={removeHttpsFromOrigins(cameraPermissionWhitelist)}
       dataDetectorTypes={dataDetectorTypes}
       useSharedProcessPool={useSharedProcessPool}
       textInteractionEnabled={textInteractionEnabled}

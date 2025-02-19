@@ -166,13 +166,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   protected @Nullable String mDownloadingMessage = null;
   protected @Nullable String mLackPermissionToDownloadMessage = null;
 
-  private static Set<String> cameraPermissionOriginWhitelist;
-
   public RNCWebViewManager() {
-    cameraPermissionOriginWhitelist = new HashSet<>();
-    cameraPermissionOriginWhitelist.add("https://alchemy.veriff.com/");
-    cameraPermissionOriginWhitelist.add("https://magic.veriff.me/");
-
     mWebViewConfig = new WebViewConfig() {
       public void configWebView(WebView webView) {
       }
@@ -230,6 +224,16 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
   private String getLackPermissionToDownloadMessage() {
     return  mDownloadingMessage == null ? DEFAULT_LACK_PERMISSION_TO_DOWNLOAD_MESSAGE : mLackPermissionToDownloadMessage;
+  }
+
+  @ReactProp(name = "cameraPermissionWhitelist")
+  public void setCameraPermissionWhitelist(RNCWebView webView, ReadableArray whitelist) {
+    Set<String> whitelistSet = new HashSet<>();
+    for (int i = 0; i < whitelist.size(); i++) {
+      whitelistSet.add(whitelist.getString(i));
+    }
+
+    mWebChromeClient.setCameraPermissionWhitelist(whitelistSet);
   }
 
   @ReactProp(name = "javaScriptEnabled")
@@ -998,10 +1002,15 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
     // True if protected media should be allowed, false otherwise
     protected boolean mAllowsProtectedMedia = false;
+    private Set<String> cameraPermissionWhitelist = new HashSet<>();
 
     public RNCWebChromeClient(ReactContext reactContext, WebView webView) {
       this.mReactContext = reactContext;
       this.mWebView = webView;
+    }
+
+    public void setCameraPermissionWhitelist(Set<String> whitelist) {
+      this.cameraPermissionWhitelist = whitelist;
     }
 
     @Override
@@ -1065,11 +1074,21 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       grantedPermissions = new ArrayList<>();
 
       ArrayList<String> requestedAndroidPermissions = new ArrayList<>();
+      String originUrl = request.getOrigin().toString();
+      String originHost;
+
+      try {
+        URL url = new URL(originUrl);
+        originHost = url.getHost();
+      } catch (MalformedURLException e) {
+        request.deny();
+        return;
+      }
 
       for (String requestedResource : request.getResources()) {
         String androidPermission = null;
 
-        if (cameraPermissionOriginWhitelist.contains(request.getOrigin().toString())) {
+        if (this.cameraPermissionWhitelist.contains(originHost)) {
           if (requestedResource.equals(PermissionRequest.RESOURCE_VIDEO_CAPTURE)) {
             androidPermission = Manifest.permission.CAMERA;
           } else if (requestedResource.equals(PermissionRequest.RESOURCE_AUDIO_CAPTURE)) {

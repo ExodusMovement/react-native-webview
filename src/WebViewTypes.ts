@@ -229,6 +229,7 @@ export interface BasicAuthCredential {
 
 export interface CommonNativeWebViewProps extends ViewProps {
   cacheEnabled?: boolean;
+  cameraPermissionWhitelist?: string[];
   incognito?: boolean;
   injectedJavaScript?: string;
   injectedJavaScriptBeforeContentLoaded?: string;
@@ -787,6 +788,13 @@ export interface WebViewSharedProps extends ViewProps {
    */
   javaScriptEnabled?: boolean;
 
+
+  /**
+   * Defines a list of domain origins that can access camera.
+   */
+
+  readonly cameraPermissionWhitelist?: string[];
+
   /**
    * Stylesheet object to set the style of the container view.
    */
@@ -889,7 +897,7 @@ export interface WebViewSharedProps extends ViewProps {
    * List of protocol schemes to allow being deep linked to. This requires
    * an exact match. The default behavior is to only allow "https:".
    */
-    readonly deeplinkWhitelist?: string[];
+  readonly deeplinkWhitelist?: string[];
 
   /**
    * Function that allows custom handling of any web view requests. Return
