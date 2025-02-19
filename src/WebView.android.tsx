@@ -20,7 +20,7 @@ import {
   defaultRenderLoading,
   useWebWiewLogic,
   versionPasses,
-  normalizeWhitelist,
+  removeHttpsFromOrigins,
 } from './WebViewShared';
 import {
   AndroidWebViewProps,
@@ -209,7 +209,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>((props, ref) => {
   const webView = <NativeWebView
     key="webViewKey"
     {...otherProps}
-    cameraPermissionWhitelist={normalizeWhitelist(cameraPermissionWhitelist)}
+    cameraPermissionWhitelist={removeHttpsFromOrigins(cameraPermissionWhitelist)}
     messagingEnabled={typeof onMessageProp === 'function'}
     messagingModuleName={messagingModuleName}
 
