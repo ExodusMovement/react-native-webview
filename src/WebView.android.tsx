@@ -20,7 +20,6 @@ import {
   defaultRenderLoading,
   useWebWiewLogic,
   versionPasses,
-  removeHttpsFromOrigins,
 } from './WebViewShared';
 import {
   AndroidWebViewProps,

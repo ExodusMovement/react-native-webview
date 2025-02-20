@@ -316,7 +316,3 @@ export const versionPasses = (version: string | undefined, minimum: string | und
   }
   return true // equals
 }
-
-export const removeHttpsFromOrigins = (whitelist: string[]) => {
-  return whitelist.map((origin) => origin.replace('https://', ''))
-}
