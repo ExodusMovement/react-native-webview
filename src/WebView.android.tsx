@@ -67,7 +67,6 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>((props, ref) => {
     scalesPageToFit = true,
     saveFormDataDisabled = false,
     cacheEnabled = true,
-    cameraPermissionWhitelist = [],
     androidHardwareAccelerationDisabled = false,
     androidLayerType = "none",
     originWhitelist = defaultOriginWhitelist,
@@ -208,7 +207,6 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>((props, ref) => {
   const webView = <NativeWebView
     key="webViewKey"
     {...otherProps}
-    cameraPermissionWhitelist={removeHttpsFromOrigins(cameraPermissionWhitelist)}
     messagingEnabled={typeof onMessageProp === 'function'}
     messagingModuleName={messagingModuleName}
 
