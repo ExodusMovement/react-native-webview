@@ -1077,7 +1077,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       final Uri originUri = request.getOrigin();
       final String scheme = originUri.getScheme();
       final int port = originUri.getPort();
-      String origin = scheme + "://" + port;
+      String origin = scheme + "://" + originUri.getHost();
 
       if (port > 0 && ((scheme == "http" && port != 80) || (scheme == "https" && port != 443))) {
         origin += ":" + port;
