@@ -22,7 +22,7 @@ static NSString *const HistoryShimName = @"ReactNativeHistoryShim";
 static NSString *const MessageHandlerName = @"ReactNativeWebView";
 static NSURLCredential* clientAuthenticationCredential;
 static NSDictionary* customCertificatesForHost;
-static NSSet *cameraPermissionWhitelist;
+static NSSet *cameraPermissionOriginWhitelist;
 
 NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 
@@ -71,7 +71,7 @@ RCTAutoInsetsProtocol>
 @property (nonatomic, strong) WKUserScript *postMessageScript;
 @property (nonatomic, strong) WKUserScript *atStartScript;
 @property (nonatomic, strong) WKUserScript *atEndScript;
-@property (nonatomic, strong) NSArray<NSString *> *cameraPermissionWhitelist;
+@property (nonatomic, strong) NSArray<NSString *> *cameraPermissionOriginWhitelist;
 @end
 
 @implementation RNCWebView
@@ -1056,24 +1056,16 @@ RCTAutoInsetsProtocol>
                         initiatedByFrame:(WKFrameInfo *)frame
                                     type:(WKMediaCaptureType)type
                          decisionHandler:(void (^)(WKPermissionDecision decision))decisionHandler {
-  if (![self.cameraPermissionWhitelist containsObject:origin.host]) {
-    decisionHandler(WKPermissionDecisionDeny);
-    return;
+  NSString *originString = [NSString stringWithFormat:@"%@://%@", origin.protocol, origin.host];
+
+  if (origin.port > 0 && (([origin.protocol isEqualToString:@"http"] && origin.port != 80) || ([origin.protocol isEqualToString:@"https"] && origin.port != 443))) {
+    originString = [originString stringByAppendingFormat:@":%ld", (long)origin.port];
   }
 
-  if (_mediaCapturePermissionGrantType == RNCWebViewPermissionGrantType_GrantIfSameHost_ElsePrompt || _mediaCapturePermissionGrantType == RNCWebViewPermissionGrantType_GrantIfSameHost_ElseDeny) {
-    if ([origin.host isEqualToString:webView.URL.host]) {
-      decisionHandler(WKPermissionDecisionGrant);
-    } else {
-      WKPermissionDecision decision = _mediaCapturePermissionGrantType == RNCWebViewPermissionGrantType_GrantIfSameHost_ElsePrompt ? WKPermissionDecisionPrompt : WKPermissionDecisionDeny;
-      decisionHandler(decision);
-    }
-  } else if (_mediaCapturePermissionGrantType == RNCWebViewPermissionGrantType_Deny) {
-    decisionHandler(WKPermissionDecisionDeny);
-  } else if (_mediaCapturePermissionGrantType == RNCWebViewPermissionGrantType_Grant) {
+  if ([self.cameraPermissionOriginWhitelist containsObject:originString]) {
     decisionHandler(WKPermissionDecisionGrant);
   } else {
-    decisionHandler(WKPermissionDecisionPrompt);
+    decisionHandler(WKPermissionDecisionDeny);
   }
 }
 #endif

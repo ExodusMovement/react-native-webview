@@ -226,14 +226,14 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     return  mDownloadingMessage == null ? DEFAULT_LACK_PERMISSION_TO_DOWNLOAD_MESSAGE : mLackPermissionToDownloadMessage;
   }
 
-  @ReactProp(name = "cameraPermissionWhitelist")
-  public void setCameraPermissionWhitelist(RNCWebView webView, ReadableArray whitelist) {
+  @ReactProp(name = "cameraPermissionOriginWhitelist")
+  public void setCameraPermissionOriginWhitelist(RNCWebView webView, ReadableArray whitelist) {
     Set<String> whitelistSet = new HashSet<>();
     for (int i = 0; i < whitelist.size(); i++) {
       whitelistSet.add(whitelist.getString(i));
     }
 
-    mWebChromeClient.setCameraPermissionWhitelist(whitelistSet);
+    mWebChromeClient.setCameraPermissionOriginWhitelist(whitelistSet);
   }
 
   @ReactProp(name = "javaScriptEnabled")
@@ -1002,15 +1002,15 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
     // True if protected media should be allowed, false otherwise
     protected boolean mAllowsProtectedMedia = false;
-    private Set<String> cameraPermissionWhitelist = new HashSet<>();
+    private Set<String> cameraPermissionOriginWhitelist = new HashSet<>();
 
     public RNCWebChromeClient(ReactContext reactContext, WebView webView) {
       this.mReactContext = reactContext;
       this.mWebView = webView;
     }
 
-    public void setCameraPermissionWhitelist(Set<String> whitelist) {
-      this.cameraPermissionWhitelist = whitelist;
+    public void setCameraPermissionOriginWhitelist(Set<String> whitelist) {
+      this.cameraPermissionOriginWhitelist = whitelist;
     }
 
     @Override
@@ -1074,21 +1074,19 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       grantedPermissions = new ArrayList<>();
 
       ArrayList<String> requestedAndroidPermissions = new ArrayList<>();
-      String originUrl = request.getOrigin().toString();
-      String originHost;
+      final Uri originUri = request.getOrigin();
+      final String scheme = originUri.getScheme();
+      final int port = originUri.getPort();
+      String origin = scheme + "://" + originUri.getHost();
 
-      try {
-        URL url = new URL(originUrl);
-        originHost = url.getHost();
-      } catch (MalformedURLException e) {
-        request.deny();
-        return;
+      if (port > 0 && ((scheme == "http" && port != 80) || (scheme == "https" && port != 443))) {
+        origin += ":" + port;
       }
 
       for (String requestedResource : request.getResources()) {
         String androidPermission = null;
 
-        if (this.cameraPermissionWhitelist.contains(originHost)) {
+        if (this.cameraPermissionOriginWhitelist.contains(origin)) {
           if (requestedResource.equals(PermissionRequest.RESOURCE_VIDEO_CAPTURE)) {
             androidPermission = Manifest.permission.CAMERA;
           } else if (requestedResource.equals(PermissionRequest.RESOURCE_AUDIO_CAPTURE)) {

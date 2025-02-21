@@ -229,7 +229,7 @@ export interface BasicAuthCredential {
 
 export interface CommonNativeWebViewProps extends ViewProps {
   cacheEnabled?: boolean;
-  cameraPermissionWhitelist?: string[];
+  cameraPermissionOriginWhitelist?: string[];
   incognito?: boolean;
   injectedJavaScript?: string;
   injectedJavaScriptBeforeContentLoaded?: string;
@@ -793,7 +793,7 @@ export interface WebViewSharedProps extends ViewProps {
    * Defines a list of domain origins that can access camera.
    */
 
-  readonly cameraPermissionWhitelist?: string[];
+  readonly cameraPermissionOriginWhitelist?: string[];
 
   /**
    * Stylesheet object to set the style of the container view.
