@@ -72,6 +72,7 @@
   "files": [
     "android",
     "!android/.gradle",
+    "!android/build",
     "apple",
     "ios",
     "lib",
