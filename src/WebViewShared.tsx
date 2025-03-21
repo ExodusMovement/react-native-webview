@@ -236,11 +236,15 @@ export const useWebWiewLogic = ({
     if (!passesWhitelistUse(nativeEvent.url)) return;
 
     // TODO: can/should we perform any other validation?
+    try {
+      const parsedData = JSON.parse(nativeEvent.data);
+      const data = JSON.stringify(validateData(parsedData));
+      const meta = validateMeta(extractMeta(nativeEvent));
 
-    const data = JSON.stringify(validateData(JSON.parse(nativeEvent.data)));
-    const meta = validateMeta(extractMeta(nativeEvent));
-
-    onMessageProp?.({ ...meta, data });
+      onMessageProp?.({ ...meta, data });
+    } catch (err) {
+      console.error('Error parsing WebView message', err);
+    }
   }, [onMessageProp, passesWhitelistUse, validateData, validateMeta]);
 
   const onLoadingProgress = useCallback((event: WebViewProgressEvent) => {
