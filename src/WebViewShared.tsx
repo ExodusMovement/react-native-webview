@@ -45,7 +45,7 @@ const _passesWhitelist = (
     const { href, origin } = new URL(url)
 
     if (origin && origin !== 'null') {
-      return matchWithRegexList(compiledWhitelist, origin);
+      return matchWithRegexList(compiledWhitelist, origin)
     }
 
     return matchWithRegexList(compiledWhitelist, href)
