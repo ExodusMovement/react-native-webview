@@ -56,8 +56,32 @@ const _passesWhitelist = (
 
 const compileWhitelist = (
   originWhitelist: readonly string[],
+  defaultEntries: readonly string[] = ['about:blank'],
 ): readonly RegExp[] =>
-  ['about:blank', ...(originWhitelist || [])].map(stringWhitelistToRegex);
+  [...defaultEntries, ...(originWhitelist || [])].map(stringWhitelistToRegex);
+
+const isDownloadMessageAllowed = ({
+  data,
+  url,
+  compiledDownloadWhitelist,
+}: {
+  data: string,
+  url: string,
+  compiledDownloadWhitelist: readonly RegExp[],
+}): boolean => {
+  try {
+    const parsedData = JSON.parse(data);
+
+    if (parsedData?.method === 'download') {
+      return _passesWhitelist(compiledDownloadWhitelist, url);
+    }
+  } catch {
+    // Ignore invalid JSON — treat as non-download message
+  }
+
+  // Non-download messages are allowed by default
+  return true;
+};
 
 const urlToProtocolScheme = (url: string): string | null => {
   try {
@@ -150,8 +174,8 @@ export {
   defaultRenderError,
 };
 
-
 export const useWebWiewLogic = ({
+  downloadOriginWhitelist,
   startInLoadingState,
   onLoadStart,
   onLoad,
@@ -166,6 +190,7 @@ export const useWebWiewLogic = ({
   validateMeta,
   validateData,
 }: {
+  downloadOriginWhitelist: readonly string[];
   startInLoadingState?: boolean
   onLoadStart?: (event: WebViewNavigationEvent) => void;
   onLoad?: (event: WebViewNavigationEvent) => void;
@@ -243,14 +268,25 @@ export const useWebWiewLogic = ({
     // TODO: can/should we perform any other validation?
     try {
       const parsedData = JSON.parse(nativeEvent.data);
-      const data = JSON.stringify(validateData(parsedData));
+      const validatedData = validateData(parsedData);
+
+      if (!isDownloadMessageAllowed({
+        data: parsedData.data,
+        url: nativeEvent.url,
+        compiledDownloadWhitelist: compileWhitelist(downloadOriginWhitelist, []),
+      })) {
+        console.warn('Download request rejected: origin not in download whitelist');
+        return;
+      }
+
+      const data = JSON.stringify(validatedData);
       const meta = validateMeta(extractMeta(nativeEvent));
 
       onMessageProp?.({ ...meta, data });
     } catch (err) {
       console.error('Error parsing WebView message', err);
     }
-  }, [onMessageProp, passesWhitelistUse, validateData, validateMeta]);
+  }, [onMessageProp, passesWhitelistUse, validateData, validateMeta, downloadOriginWhitelist]);
 
   const onLoadingProgress = useCallback((event: WebViewProgressEvent) => {
     const { nativeEvent: { progress } } = event;
