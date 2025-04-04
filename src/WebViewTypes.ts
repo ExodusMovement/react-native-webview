@@ -788,11 +788,17 @@ export interface WebViewSharedProps extends ViewProps {
    */
   javaScriptEnabled?: boolean;
 
+  /**
+   * List of origin strings that are allowed to send download data through postMessage.
+   * The strings allow wildcards and get matched against *just* the origin (not the full URL).
+   * If a download request comes from an origin not in this whitelist, it will be ignored.
+   * The default whitelisted origins are empty array [].
+   */
+  readonly downloadOriginWhitelist?: string[];
 
   /**
    * Defines a list of domain origins that can access camera.
    */
-
   readonly cameraPermissionOriginWhitelist?: string[];
 
   /**
