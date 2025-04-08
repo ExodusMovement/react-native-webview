@@ -71,7 +71,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>((props, ref) => {
     androidLayerType = "none",
     originWhitelist = defaultOriginWhitelist,
     deeplinkWhitelist = defaultDeeplinkWhitelist,
-    downloadOriginWhitelist = [],
+    downloadWhitelist = [],
     setBuiltInZoomControls = true,
     setDisplayZoomControls = false,
     nestedScrollEnabled = false,
@@ -109,7 +109,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>((props, ref) => {
   }, []);
 
   const { onLoadingStart, onShouldStartLoadWithRequest, onMessage, viewState, setViewState, lastErrorEvent, onLoadingError, onLoadingFinish, onLoadingProgress, onOpenWindow, passesWhitelist } = useWebWiewLogic({
-    downloadOriginWhitelist,
+    downloadWhitelist,
     onLoad,
     onError,
     onLoadEnd,
