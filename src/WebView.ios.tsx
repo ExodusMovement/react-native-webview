@@ -74,7 +74,7 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>((props, ref) => {
     cacheEnabled = true,
     originWhitelist = defaultOriginWhitelist,
     deeplinkWhitelist = defaultDeeplinkWhitelist,
-    downloadOriginWhitelist = [],
+    downloadWhitelist = [],
     textInteractionEnabled= true,
     injectedJavaScript,
     injectedJavaScriptBeforeContentLoaded,
@@ -112,7 +112,7 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>((props, ref) => {
   }, []);
 
   const { onLoadingStart, onShouldStartLoadWithRequest, onMessage, viewState, setViewState, lastErrorEvent, onLoadingError, onLoadingFinish, onLoadingProgress } = useWebWiewLogic({
-    downloadOriginWhitelist,
+    downloadWhitelist,
     onLoad,
     onError,
     onLoadEnd,

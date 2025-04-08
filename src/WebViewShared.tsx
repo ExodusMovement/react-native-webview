@@ -63,24 +63,38 @@ const compileWhitelist = (
 const isDownloadMessageAllowed = ({
   data,
   url,
-  compiledDownloadWhitelist,
+  downloadWhitelist,
 }: {
-  data: string,
-  url: string,
-  compiledDownloadWhitelist: readonly RegExp[],
+  data: string;
+  url: string;
+  downloadWhitelist: { origin: string; allowedFileExtensions: string[] }[];
 }): boolean => {
+  let parsedData;
+  
   try {
-    const parsedData = JSON.parse(data);
-
-    if (parsedData?.method === 'download') {
-      return _passesWhitelist(compiledDownloadWhitelist, url);
-    }
+    parsedData = JSON.parse(data);
   } catch {
-    // Ignore invalid JSON — treat as non-download message
+    return true; // Invalid JSON — treat as non-download message
   }
 
-  // Non-download messages are allowed by default
-  return true;
+  if (parsedData.method !== 'download') {
+    return true;
+  }
+
+  const { origin } = new URL(url);
+  const fileExtension = parsedData.params?.fileName?.split('.').pop()?.toLowerCase();
+  
+  if (!fileExtension || !origin) {
+    return false;
+  }
+
+  const matchingRule = downloadWhitelist.find(rule => {
+    const ruleOriginRegex = stringWhitelistToRegex(rule.origin);
+
+    return ruleOriginRegex.test(origin) && rule.allowedFileExtensions.includes(fileExtension);
+  });
+
+  return Boolean(matchingRule);
 };
 
 const urlToProtocolScheme = (url: string): string | null => {
@@ -175,7 +189,7 @@ export {
 };
 
 export const useWebWiewLogic = ({
-  downloadOriginWhitelist,
+  downloadWhitelist,
   startInLoadingState,
   onLoadStart,
   onLoad,
@@ -190,7 +204,7 @@ export const useWebWiewLogic = ({
   validateMeta,
   validateData,
 }: {
-  downloadOriginWhitelist: readonly string[];
+  downloadWhitelist: { origin: string; allowedFileExtensions: string[] }[];
   startInLoadingState?: boolean
   onLoadStart?: (event: WebViewNavigationEvent) => void;
   onLoad?: (event: WebViewNavigationEvent) => void;
@@ -263,7 +277,9 @@ export const useWebWiewLogic = ({
 
   const onMessage = useCallback((event: WebViewMessageEvent) => {
     const { nativeEvent } = event;
-    if (!passesWhitelistUse(nativeEvent.url)) return;
+    const { url } = nativeEvent;
+
+    if (!passesWhitelistUse(url)) return;
 
     // TODO: can/should we perform any other validation?
     try {
@@ -272,10 +288,10 @@ export const useWebWiewLogic = ({
 
       if (!isDownloadMessageAllowed({
         data: parsedData.data,
-        url: nativeEvent.url,
-        compiledDownloadWhitelist: compileWhitelist(downloadOriginWhitelist, []),
+        downloadWhitelist,
+        url,
       })) {
-        console.warn('Download request rejected: origin not in download whitelist');
+        console.warn('Download request rejected: origin not in download whitelist or file extension not allowed');
         return;
       }
 
@@ -286,7 +302,7 @@ export const useWebWiewLogic = ({
     } catch (err) {
       console.error('Error parsing WebView message', err);
     }
-  }, [onMessageProp, passesWhitelistUse, validateData, validateMeta, downloadOriginWhitelist]);
+  }, [onMessageProp, passesWhitelistUse, validateData, validateMeta, downloadWhitelist]);
 
   const onLoadingProgress = useCallback((event: WebViewProgressEvent) => {
     const { nativeEvent: { progress } } = event;
