@@ -80,10 +80,8 @@ const createOnShouldStartLoadWithRequest = (
     let shouldStart = true;
     const { url, lockIdentifier, isTopFrame } = nativeEvent;
 
-    if (onShouldStartLoadWithRequest) {
-      shouldStart = onShouldStartLoadWithRequest(nativeEvent);
-    } else if (!_passesWhitelist(compiledWhiteList, url)) {
-      /** Check if the url passes the origin whitelist */
+    /** Check if the url passes the origin whitelist */
+    if (!_passesWhitelist(compiledWhiteList, url)) {
       const protocol = urlToProtocolScheme(url)
       
       /* Check that the protocol was properly parsed */
@@ -113,6 +111,8 @@ const createOnShouldStartLoadWithRequest = (
       }
 
       shouldStart = false;
+    } else if (onShouldStartLoadWithRequest) {
+      shouldStart = onShouldStartLoadWithRequest(nativeEvent);
     }
 
     loadRequest(shouldStart, url, lockIdentifier);
