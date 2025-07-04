@@ -20,7 +20,7 @@ const defaultDeeplinkWhitelist = ['https:'] as const;
 const defaultDeeplinkBlocklist = [`http:`, `file:`, `javascript:`] as const;
 
 const stringWhitelistToRegex = (originWhitelist: string): RegExp =>
-  new RegExp(escapeStringRegexp(originWhitelist).replace(/^(https?:\/\/|mailto:).*/, '^$1.*$'));
+  new RegExp(`^${escapeStringRegexp(originWhitelist).replace(/\\\*/g, '.*')}$`)
 
 const matchWithRegexList = (
   compiledRegexList: readonly RegExp[],
