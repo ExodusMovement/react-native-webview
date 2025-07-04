@@ -20,7 +20,7 @@ const defaultDeeplinkWhitelist = ['https:'] as const;
 const defaultDeeplinkBlocklist = [`http:`, `file:`, `javascript:`] as const;
 
 const stringWhitelistToRegex = (originWhitelist: string): RegExp =>
-  new RegExp(`^${escapeStringRegexp(originWhitelist).replace(/\\\*/g, '.*')}$`);
+  new RegExp(escapeStringRegexp(originWhitelist).replace(/^(https?:\/\/|mailto:).*/, '^$1.*$'));
 
 const matchWithRegexList = (
   compiledRegexList: readonly RegExp[],
@@ -42,8 +42,13 @@ const _passesWhitelist = (
   url: string,
 ) => {
   try {
-    const { origin } = new URL(url)
-    return origin && matchWithRegexList(compiledWhitelist, origin)
+    const { href, origin } = new URL(url)
+
+    if (origin && origin !== 'null') {
+      return matchWithRegexList(compiledWhitelist, origin);
+    }
+
+    return matchWithRegexList(compiledWhitelist, href)
   } catch {
     return false
   }
