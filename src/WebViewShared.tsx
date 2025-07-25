@@ -99,7 +99,7 @@ const createOnShouldStartLoadWithRequest = (
     
           if (foundMatchInAllowlist) {
             Linking.canOpenURL(url).then((supported) => {
-              if (supported && isTopFrame) {
+              if ((supported && isTopFrame) || protocol.startsWith('mailto:')) {
                 return Linking.openURL(url);
               }
               console.warn(`Can't open url: ${url}`);
