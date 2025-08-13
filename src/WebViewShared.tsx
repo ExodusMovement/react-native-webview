@@ -284,7 +284,7 @@ export const useWebWiewLogic = ({
       const validatedData = validateData(parsedData);
 
       if (!isDownloadMessageAllowed({
-        data: parsedData.data,
+        data: (validatedData as { data?: string })?.data ?? '',
         downloadWhitelist,
         url: nativeEvent.url,
       })) {
