@@ -45,7 +45,7 @@ const _passesWhitelist = (
     const { href, origin } = new URL(url)
 
     if (origin && origin !== 'null') {
-      return matchWithRegexList(compiledWhitelist, origin)
+      return matchWithRegexList(compiledWhitelist, origin);
     }
 
     return matchWithRegexList(compiledWhitelist, href)
@@ -56,9 +56,8 @@ const _passesWhitelist = (
 
 const compileWhitelist = (
   originWhitelist: readonly string[],
-  defaultEntries: readonly string[] = ['about:blank'],
 ): readonly RegExp[] =>
-  [...defaultEntries, ...(originWhitelist || [])].map(stringWhitelistToRegex);
+['about:blank', ...(originWhitelist || [])].map(stringWhitelistToRegex);
 
 const isDownloadMessageAllowed = ({
   data,
@@ -277,9 +276,7 @@ export const useWebWiewLogic = ({
 
   const onMessage = useCallback((event: WebViewMessageEvent) => {
     const { nativeEvent } = event;
-    const { url } = nativeEvent;
-
-    if (!passesWhitelistUse(url)) return;
+    if (!passesWhitelistUse(nativeEvent.url)) return;
 
     // TODO: can/should we perform any other validation?
     try {
@@ -289,7 +286,7 @@ export const useWebWiewLogic = ({
       if (!isDownloadMessageAllowed({
         data: parsedData.data,
         downloadWhitelist,
-        url,
+        url: nativeEvent.url,
       })) {
         console.warn('Download request rejected: origin not in download whitelist or file extension not allowed');
         return;
