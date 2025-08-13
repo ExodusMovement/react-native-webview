@@ -87,7 +87,7 @@ const isDownloadMessageAllowed = ({
     return false;
   }
 
-  return Boolean(downloadWhitelist.find((rule) => rule.origin === origin && rule.allowedFileExtensions.includes(fileExtension)));
+  return Boolean(downloadWhitelist.find((rule) => rule.origin === origin && [rule.allowedFileExtensions].flat().includes(fileExtension)));
 };
 
 const urlToProtocolScheme = (url: string): string | null => {
