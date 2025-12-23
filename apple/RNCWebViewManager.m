@@ -254,7 +254,7 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
   request[@"lockIdentifier"] = @(_shouldStartLoadLock.condition);
   callback(request);
 
-  // Block the main thread for a maximum of 250ms until the JS thread returns
+  // Block the main thread for a maximum of 500ms until the JS thread returns
   if ([_shouldStartLoadLock lockWhenCondition:0 beforeDate:[NSDate dateWithTimeIntervalSinceNow:.50]]) {
     BOOL returnValue = _shouldStartLoad;
     [_shouldStartLoadLock unlock];
