@@ -9,6 +9,7 @@
 #import <React/RCTConvert.h>
 #import <React/RCTAutoInsetsProtocol.h>
 #import "RNCWKProcessPoolManager.h"
+#import "RNCWebViewDecisionManager.h"
 #if !TARGET_OS_OSX
 #import <UIKit/UIKit.h>
 #else
@@ -1106,7 +1107,32 @@ RCTAutoInsetsProtocol>
   NSURLRequest *request = navigationAction.request;
   BOOL isTopFrame = [request.URL isEqual:request.mainDocumentURL];
   
+  void (^allowNavigation)(void) = ^{
+    if (self->_onLoadingStart) {
+      // We have this check to filter out iframe requests and whatnot
+      if (isTopFrame) {
+        NSMutableDictionary<NSString *, id> *event = [self baseEvent];
+        [event addEntriesFromDictionary: @{
+            @"url": (request.URL).absoluteString,
+            @"navigationType": navigationTypes[@(navigationType)]
+          }];
+          self->_onLoadingStart(event);
+      }
+    }
+    decisionHandler(WKNavigationActionPolicyAllow);
+  };
+
   if (_onShouldStartLoadWithRequest) {
+    int lockIdentifier = [[RNCWebViewDecisionManager getInstance] setDecisionHandler:^(BOOL shouldStart) {
+      dispatch_async(dispatch_get_main_queue(), ^{
+        if (!shouldStart) {
+          decisionHandler(WKNavigationActionPolicyCancel);
+          return;
+        }
+        allowNavigation();
+      });
+    }];
+
     NSMutableDictionary<NSString *, id> *event = [self baseEvent];
     if (request.mainDocumentURL) {
       [event addEntriesFromDictionary: @{
@@ -1116,30 +1142,15 @@ RCTAutoInsetsProtocol>
     [event addEntriesFromDictionary: @{
       @"url": (request.URL).absoluteString,
       @"navigationType": navigationTypes[@(navigationType)],
-      @"isTopFrame": @(isTopFrame)
+      @"isTopFrame": @(isTopFrame),
+      @"lockIdentifier": @(lockIdentifier)
     }];
-    if (![self.delegate webView:self
-      shouldStartLoadForRequest:event
-                   withCallback:_onShouldStartLoadWithRequest]) {
-      decisionHandler(WKNavigationActionPolicyCancel);
-      return;
-    }
-  }
-  
-  if (_onLoadingStart) {
-    // We have this check to filter out iframe requests and whatnot
-    if (isTopFrame) {
-      NSMutableDictionary<NSString *, id> *event = [self baseEvent];
-      [event addEntriesFromDictionary: @{
-        @"url": (request.URL).absoluteString,
-        @"navigationType": navigationTypes[@(navigationType)]
-      }];
-      _onLoadingStart(event);
-    }
+    _onShouldStartLoadWithRequest(event);
+    return;
   }
   
   // Allow all navigation by default
-  decisionHandler(WKNavigationActionPolicyAllow);
+  allowNavigation();
 }
 
 /**

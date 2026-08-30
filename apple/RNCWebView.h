@@ -19,14 +19,6 @@ typedef enum RNCWebViewPermissionGrantType : NSUInteger {
 
 @class RNCWebView;
 
-@protocol RNCWebViewDelegate <NSObject>
-
-- (BOOL)webView:(RNCWebView *_Nonnull)webView
-shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *_Nonnull)request
-   withCallback:(RCTDirectEventBlock _Nonnull)callback;
-
-@end
-
 @interface RNCWeakScriptMessageDelegate : NSObject<WKScriptMessageHandler>
 
 @property (nonatomic, weak, nullable) id<WKScriptMessageHandler> scriptDelegate;
@@ -37,7 +29,6 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *_Nonnull)request
 
 @interface RNCWebView : RCTView
 
-@property (nonatomic, weak) id<RNCWebViewDelegate> _Nullable delegate;
 @property (nonatomic, copy) NSDictionary * _Nullable source;
 @property (nonatomic, assign) BOOL messagingEnabled;
 @property (nonatomic, copy) NSString * _Nullable injectedJavaScript;
